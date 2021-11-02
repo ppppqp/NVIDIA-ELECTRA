@@ -14,6 +14,7 @@
 # limitations under the License.
 
 CMD=${1:-/bin/bash}
+ELECTRA_DIR=/data/electra_research/NVIDIA-ELECTRA
 NV_VISIBLE_DEVICES=${2:-"all"}
 DOCKER_BRIDGE=${3:-"host"}
 
@@ -25,5 +26,5 @@ docker run -it --rm \
   --ulimit stack=67108864 \
   --privileged \
   -e LD_LIBRARY_PATH='/workspace/install/lib/' \
-  -v $PWD:/workspace/electra \
+  -v $ELECTRA_DIR:/workspace/electra \
   electra $CMD
