@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-checkpoints=${checkpoints:-"results/base/checkpoints"}
+checkpoints=${checkpoints:-"results/models/base/checkpoints"}
 for folder in $checkpoints; do
 
     ckpts_dir=${folder}
@@ -22,7 +22,9 @@ for folder in $checkpoints; do
         ckpt=${f%.*}
         echo "==================================== START $ckpt ===================================="
         python postprocess_pretrained_ckpt.py --pretrained_checkpoint=$ckpt --output_dir=$output_dir --amp
-        bash scripts/run_squad.sh $output_dir/discriminator;
+        bash scripts/run_squad.sh $(source scripts/configs/squad_config.sh && rtx3090_1gpu_amp_local) eval;
         echo "====================================  END $ckpt  ====================================";
     done
 done
+#bash scripts/run_squad.sh $(source scripts/configs/squad_config.sh && dgxa100_8gpu_amp) train_eval
+# bash scripts/run_squad.sh results/models/base/checkpoints/discriminator;

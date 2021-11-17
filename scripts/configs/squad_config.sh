@@ -12,6 +12,43 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+rtx3090_1gpu_amp_local ()
+{
+    electra_model="results/models/base/checkpoints/discriminator"
+    epochs="2"
+    batch_size="16"
+    infer_batch_size="128"
+    learning_rate="4e-4"
+    precision="amp"
+    num_gpu="1"
+    seed="1"
+    SQUAD_VERSION="1.1"
+    squad_dir="/workspace/electra/data/download/squad/v$SQUAD_VERSION"
+    OUT_DIR="results/"
+    init_checkpoint="checkpoints/electra_base_qa_v2_False_epoch_2_ckpt"
+    echo $electra_model $epochs $batch_size $infer_batch_size $learning_rate \
+     $precision $num_gpu $seed $SQUAD_VERSION $squad_dir \
+     $OUT_DIR $init_checkpoint
+}
+
+rtx3090_1gpu_amp ()
+{
+    electra_model="google/electra-base-discriminator"
+    epochs="2"
+    batch_size="16"
+    infer_batch_size="128"
+    learning_rate="4e-4"
+    precision="amp"
+    num_gpu="1"
+    seed="1"
+    SQUAD_VERSION="1.1"
+    squad_dir="/workspace/electra/data/download/squad/v$SQUAD_VERSION"
+    OUT_DIR="results/"
+    init_checkpoint="checkpoints/electra_base_qa_v2_False_epoch_2_ckpt"
+    echo $electra_model $epochs $batch_size $infer_batch_size $learning_rate \
+     $precision $num_gpu $seed $SQUAD_VERSION $squad_dir \
+     $OUT_DIR $init_checkpoint
+}
 
 dgxa100_8gpu_amp ()
 {
