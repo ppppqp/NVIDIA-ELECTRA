@@ -17,13 +17,16 @@
 import functools
 import logging
 import os
+import math
 
+import tensorflow as tf
+from packaging import version
 import h5py
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras.saving import hdf5_format
 
-from configuration_utils import PretrainedConfig, BertConfig
+from configuration_utils import PretrainedConfig, BertConfig, GPT2Config
 from file_utils import DUMMY_INPUTS, TF2_WEIGHTS_NAME, WEIGHTS_NAME, cached_path, hf_bucket_url, is_remote_url
 from file_utils import MULTIPLE_CHOICE_DUMMY_INPUTS, add_start_docstrings, add_start_docstrings_to_callable
 from tokenization_utils import BatchEncoding
@@ -1757,6 +1760,7 @@ def swish(x):
 
 
 ACT2FN = {
+    
     "gelu": tf.keras.layers.Activation(gelu),
     "relu": tf.keras.activations.relu,
     "swish": tf.keras.layers.Activation(swish),
@@ -2841,3 +2845,276 @@ class TFBertForQuestionAnswering(TFBertPreTrainedModel):
         outputs = (start_logits, end_logits,) + outputs[2:]
 
         return outputs  # start_logits, end_logits, (hidden_states), (attentions)
+
+
+
+###_________________________________GPT2__________________________________###
+
+TF_GPT2_PRETRAINED_MODEL_ARCHIVE_MAP = {"gpt2": "https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-tf_model.h5",
+                                     "gpt2-medium": "https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-medium-tf_model.h5",
+                                     "gpt2-large": "https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-large-tf_model.h5"}
+
+
+
+
+
+def load_gpt2_pt_weights_in_tf2(tf_model, pytorch_checkpoint_path):
+    # build the network
+    inputs_list = [[7, 6, 0, 0, 1], [1, 2, 3, 0, 0], [0, 0, 0, 4, 5]]
+    tf_inputs = tf.constant(inputs_list)
+    tfo = tf_model(tf_inputs, training=False)
+    raise NotImplementedError
+    # return load_pytorch_checkpoint_in_tf2_model(tf_model, pytorch_checkpoint_path, tf_inputs=tf_inputs)
+
+
+class TFGPT2PreTrainedModel(TFPreTrainedModel):
+    """ An abstract class to handle weights initialization and
+        a simple interface for dowloading and loading pretrained models.
+    """
+    config_class = GPT2Config
+    pretrained_model_archive_map = TF_GPT2_PRETRAINED_MODEL_ARCHIVE_MAP
+    load_pt_weights = load_gpt2_pt_weights_in_tf2
+    base_model_prefix = "transformer"
+
+
+class TFAttention(tf.keras.layers.Layer):
+    def __init__(self, nx, config, scale=False, is_cross_attention=False, **kwargs):
+        super().__init__(**kwargs)
+
+        n_state = nx  # in Attention: n_state=768 (nx=n_embd)
+        # [switch nx => n_state from Block to Attention to keep identical to TF implementation]
+        assert n_state % config.n_head == 0
+        self.n_head = config.n_head
+        self.split_size = n_state
+        self.scale = scale
+        self.output_attentions = config.output_attentions
+
+        self.is_cross_attention = is_cross_attention
+
+        if self.is_cross_attention:
+            self.c_attn = TFConv1D(n_state * 2, nx, initializer_range=config.initializer_range, name="c_attn")
+            self.q_attn = TFConv1D(n_state, nx, initializer_range=config.initializer_range, name="q_attn")
+        else:
+            self.c_attn = TFConv1D(n_state * 3, nx, initializer_range=config.initializer_range, name="c_attn")
+
+        self.c_proj = TFConv1D(n_state, nx, initializer_range=config.initializer_range, name="c_proj")
+        self.attn_dropout = tf.keras.layers.Dropout(config.attn_pdrop)
+        self.resid_dropout = tf.keras.layers.Dropout(config.resid_pdrop)
+        self.pruned_heads = set()
+
+    def prune_heads(self, heads):
+        pass
+
+    @staticmethod
+    def causal_attention_mask(nd, ns, dtype):
+        """
+        1's in the lower triangle, counting from the lower right corner. Same as tf.matrix_band_part(tf.ones([nd, ns]),
+        -1, ns-nd), but doesn't produce garbage on TPUs.
+        """
+        i = tf.range(nd)[:, None]
+        j = tf.range(ns)
+        m = i >= j - ns + nd
+        return tf.cast(m, dtype)
+
+    def _attn(self, q, k, v, attention_mask, head_mask, output_attentions, training=False):
+        # q, k, v have shape [batch, heads, sequence, features]
+        w = tf.matmul(q, k, transpose_b=True)
+        if self.scale:
+            dk = tf.cast(shape_list(k)[-1], dtype=w.dtype)  # scale attention_scores
+            w = w / tf.math.sqrt(dk)
+
+        if not self.is_cross_attention:
+            # if only "normal" attention layer implements causal mask
+
+            # w has shape [batch, heads, dst_sequence, src_sequence], where information flows from src to dst.
+            _, _, nd, ns = shape_list(w)
+            b = self.causal_attention_mask(nd, ns, dtype=w.dtype)
+            b = tf.reshape(b, [1, 1, nd, ns])
+            w = w * b - 1e4 * (1 - b)
+
+        if attention_mask is not None:
+            # Apply the attention mask
+            attention_mask = tf.cast(attention_mask, dtype=w.dtype)
+            w = w + attention_mask
+
+        w = tf.nn.softmax(w, axis=-1)
+        w = self.attn_dropout(w, training=training)
+
+        # Mask heads if we want to
+        if head_mask is not None:
+            w = w * head_mask
+
+        outputs = [tf.matmul(w, v)]
+        if output_attentions:
+            outputs.append(w)
+        return outputs
+
+    def merge_heads(self, x):
+        x = tf.transpose(x, [0, 2, 1, 3])
+        x_shape = shape_list(x)
+        new_x_shape = x_shape[:-2] + [x_shape[-2] * x_shape[-1]]
+        return tf.reshape(x, new_x_shape)
+
+    def split_heads(self, x):
+        x_shape = shape_list(x)
+        new_x_shape = x_shape[:-1] + [self.n_head, x_shape[-1] // self.n_head]
+        x = tf.reshape(x, new_x_shape)
+        return tf.transpose(x, (0, 2, 1, 3))  # (batch, head, seq_length, head_features)
+
+    def call(
+        self,
+        x,
+        layer_past,
+        attention_mask,
+        head_mask,
+        encoder_hidden_states,
+        encoder_attention_mask,
+        use_cache,
+        output_attentions,
+        training=False,
+    ):
+
+        if encoder_hidden_states is not None:
+            if not hasattr(self, "q_attn"):
+                raise ValueError(
+                    "If class is used as cross attention, the weights `q_attn` have to be defined. "
+                    "Please make sure to instantiate class with `GPT2Attention(..., is_cross_attention=True)`."
+                )
+
+            query = self.q_attn(x)
+            kv_out = self.c_attn(encoder_hidden_states)
+            key, value = tf.split(kv_out, 2, axis=2)
+            attention_mask = encoder_attention_mask
+        else:
+            x = self.c_attn(x)
+            query, key, value = tf.split(x, 3, axis=2)
+
+        query = self.split_heads(query)
+        key = self.split_heads(key)
+        value = self.split_heads(value)
+        if layer_past is not None:
+            past_key, past_value = tf.unstack(layer_past, axis=0)
+            key = tf.concat([past_key, key], axis=-2)
+            value = tf.concat([past_value, value], axis=-2)
+
+        # to cope with keras serialization
+        if use_cache:
+            present = tf.stack([key, value], axis=0)
+        else:
+            present = (None,)
+
+        attn_outputs = self._attn(query, key, value, attention_mask, head_mask, output_attentions, training=training)
+        a = attn_outputs[0]
+
+        a = self.merge_heads(a)
+        a = self.c_proj(a)
+        a = self.resid_dropout(a, training=training)
+
+        outputs = [a, present] + attn_outputs[1:]
+        return outputs  # a, present, (attentions)
+
+
+class TFMLP(tf.keras.layers.Layer):
+    def __init__(self, n_state, config, **kwargs):
+        super().__init__(**kwargs)
+        nx = config.n_embd
+        self.c_fc = TFConv1D(n_state, nx, initializer_range=config.initializer_range, name="c_fc")
+        self.c_proj = TFConv1D(nx, n_state, initializer_range=config.initializer_range, name="c_proj")
+        self.act = get_tf_activation(config.activation_function)
+        self.dropout = tf.keras.layers.Dropout(config.resid_pdrop)
+
+    def call(self, x, training=False):
+        h = self.act(self.c_fc(x))
+        h2 = self.c_proj(h)
+        h2 = self.dropout(h2, training=training)
+        return h2
+class TFBlock(tf.keras.layers.Layer):
+    def __init__(self, config, scale=False, **kwargs):
+        super().__init__(**kwargs)
+        nx = config.n_embd
+        inner_dim = config.n_inner if config.n_inner is not None else 4 * nx
+        self.ln_1 = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_epsilon, name="ln_1")
+        self.attn = TFAttention(nx, config, scale, name="attn")
+        self.ln_2 = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_epsilon, name="ln_2")
+
+        if config.add_cross_attention:
+
+            self.crossattention = TFAttention(nx, config, scale, name="crossattention", is_cross_attention=True)
+            self.ln_cross_attn = tf.keras.layers.LayerNormalization(
+                epsilon=config.layer_norm_epsilon, name="ln_cross_attn"
+            )
+
+        self.mlp = TFMLP(inner_dim, config, name="mlp")
+
+    def call(
+        self,
+        x,
+        layer_past,
+        attention_mask,
+        head_mask,
+        encoder_hidden_states,
+        encoder_attention_mask,
+        use_cache,
+        output_attentions,
+        training=False,
+    ):
+        a = self.ln_1(x)
+        output_attn = self.attn(
+            a,
+            layer_past=layer_past,
+            attention_mask=attention_mask,
+            head_mask=head_mask,
+            encoder_hidden_states=None,
+            encoder_attention_mask=None,
+            use_cache=use_cache,
+            output_attentions=output_attentions,
+            training=training,
+        )
+        a = output_attn[0]  # output_attn: a, present, (attentions)
+        outputs = output_attn[1:]
+        x = x + a
+
+        # Cross-Attention Block
+        if encoder_hidden_states is not None:
+            # add one self-attention block for cross-attention
+            if not hasattr(self, "crossattention"):
+                raise ValueError(
+                    f"If `encoder_hidden_states` are passed, {self} has to be instantiated with "
+                    "cross-attention layers by setting `config.add_cross_attention=True`"
+                )
+
+            ca = self.ln_cross_attn(x)
+            output_cross_attn = self.crossattention(
+                ca,
+                layer_past=None,
+                attention_mask=attention_mask,
+                head_mask=head_mask,
+                encoder_hidden_states=encoder_hidden_states,
+                encoder_attention_mask=encoder_attention_mask,
+                use_cache=False,
+                output_attentions=output_attentions,
+                training=training,
+            )
+            ca = output_cross_attn[0]  # output_attn: a, present, (cross_attentions)
+            x = x + ca
+            outputs = outputs + output_cross_attn[2:]  # add cross attentions if we output attention weights
+
+        m = self.ln_2(x)
+        m = self.mlp(m, training=training)
+        x = x + m
+
+        outputs = [x] + outputs
+        return outputs  # x, present, (attentions, cross_attentions)
+
+
+
+
+
+
+
+
+def get_tf_activation(activation_string):
+    if activation_string in ACT2FN:
+        return ACT2FN[activation_string]
+    else:
+        raise KeyError(f"function {activation_string} not found in ACT2FN mapping {list(ACT2FN.keys())}")

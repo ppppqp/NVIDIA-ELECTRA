@@ -16,10 +16,12 @@
 import logging
 
 import tensorflow as tf
-
-from configuration import ElectraConfig
+# from transformers import TFGPT2MainLayer, TFBlock, TFBaseModelOutputWithPastAndCrossAttentions
+# from transformers import TFGPT2PreTrainedModel
+from modeling_utils import TFBlock
+from configuration_ganzs import ElectraConfig
 from file_utils import add_start_docstrings, add_start_docstrings_to_callable
-from modeling_utils import ACT2FN, TFBertEncoder, TFBertPreTrainedModel
+from modeling_utils import ACT2FN, TFBertEncoder, TFGPT2PreTrainedModel
 from modeling_utils import get_initializer, shape_list
 from tokenization_utils import BatchEncoding
 import pretrain_utils, collections
@@ -143,6 +145,7 @@ class TFElectraEmbeddings(tf.keras.layers.Layer):
         return tf.reshape(logits, [batch_size, length, self.vocab_size])
 
 
+#DONE
 class TFElectraDiscriminatorPredictions(tf.keras.layers.Layer):
     def __init__(self, config, **kwargs):
         super().__init__(**kwargs)
@@ -177,7 +180,7 @@ class TFElectraGeneratorPredictions(tf.keras.layers.Layer):
         return hidden_states
 
 
-class TFElectraPreTrainedModel(TFBertPreTrainedModel):
+class TFElectraPreTrainedModel(TFGPT2PreTrainedModel):
 
     config_class = ElectraConfig
     pretrained_model_archive_map = TF_ELECTRA_PRETRAINED_MODEL_ARCHIVE_MAP
@@ -213,7 +216,7 @@ class TFElectraPreTrainedModel(TFBertPreTrainedModel):
 
         return head_mask
 
-
+# SWAP WITH TFGPT2MainLayer
 class TFElectraMainLayer(TFElectraPreTrainedModel):
 
     config_class = ElectraConfig
@@ -222,17 +225,31 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
         super().__init__(config, **kwargs)
 
         if shared_embeddings and input_embeddings is not None:
-            self.embeddings = input_embeddings
+            self.wte = input_embeddings
         else:
-            self.embeddings = TFElectraEmbeddings(config, name="embeddings")
-
+            self.wte = TFElectraEmbeddings(config, name="embeddings")
+        #synonym
+        self.embeddings = self.wte
         if config.embedding_size != config.hidden_size:
             self.embeddings_project = tf.keras.layers.Dense(
                 config.hidden_size,
                 kernel_initializer=get_initializer(config.initializer_range),
                 name="embeddings_project")
-        self.encoder = TFBertEncoder(config, name="encoder")
-        self.config = config
+        # self.encoder = TFGPT2Model(config, name="encoder")
+        self.output_attentions = config.output_attentions
+        self.output_hidden_states = config.output_hidden_states
+        # self.use_cache = config.use_cache
+        # self.return_dict = config.use_return_dict
+
+        self.num_hidden_layers = config.n_layer
+        self.vocab_size = config.vocab_size
+        self.n_embd = config.n_embd
+        self.n_positions = config.n_positions
+        self.initializer_range = config.initializer_range
+        self.drop = tf.keras.layers.Dropout(config.embd_pdrop)
+        self.h = [TFBlock(config, scale=True, name=f"h_._{i}") for i in range(config.n_layer)]
+        self.ln_f = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_epsilon, name="ln_f")
+
 
     def get_input_embeddings(self):
         return self.embeddings
@@ -250,57 +267,212 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
     def call(
         self,
         inputs,
+        input_ids=None,
+        past_key_values=None,
         attention_mask=None,
         token_type_ids=None,
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
+        encoder_hidden_states=None,
+        encoder_attention_mask=None,
+        use_cache=None,
+        output_attentions=None,
+        output_hidden_states=None,
+        return_dict=None,
         training=False,
+        **kwargs,
     ):
         if isinstance(inputs, (tuple, list)):
+            # FIXME!
             input_ids = inputs[0]
-            attention_mask = inputs[1] if len(inputs) > 1 else attention_mask
-            token_type_ids = inputs[2] if len(inputs) > 2 else token_type_ids
-            position_ids = inputs[3] if len(inputs) > 3 else position_ids
-            head_mask = inputs[4] if len(inputs) > 4 else head_mask
-            inputs_embeds = inputs[5] if len(inputs) > 5 else inputs_embeds
-            assert len(inputs) <= 6, "Too many inputs."
+            past_key_values = inputs[1] if len(inputs) > 1 else past_key_values
+            attention_mask = inputs[2] if len(inputs) > 2 else attention_mask
+            token_type_ids = inputs[3] if len(inputs) > 3 else token_type_ids
+            position_ids = inputs[4] if len(inputs) > 4 else position_ids
+            head_mask=inputs[5] if len(inputs) > 5 else position_ids
+            inputs_embeds = inputs[6] if len(inputs) > 6 else inputs_embeds
+            encoder_hidden_states = inputs[7] if len(inputs) > 7 else encoder_hidden_states
+            encoder_attention_mask = inputs[8] if len(inputs) > 8 else encoder_attention_mask
+            use_cache = inputs[9] if len(inputs) > 9 else use_cache
+            output_attentions = inputs[10] if len(inputs) > 10 else output_attentions
+            output_hidden_states = inputs[11] if len(inputs) > 11 else output_hidden_states
+            return_dict = inputs[12] if len(inputs) > 12 else return_dict
+
+            assert len(inputs) <= 13, "Too many inputs."
         elif isinstance(inputs, (dict, BatchEncoding)):
+            # FIXME!
             input_ids = inputs.get("input_ids")
+            past_key_values = inputs.get("past_key_values", attention_mask)
             attention_mask = inputs.get("attention_mask", attention_mask)
             token_type_ids = inputs.get("token_type_ids", token_type_ids)
             position_ids = inputs.get("position_ids", position_ids)
             head_mask = inputs.get("head_mask", head_mask)
             inputs_embeds = inputs.get("inputs_embeds", inputs_embeds)
-            assert len(inputs) <= 6, "Too many inputs."
+            encoder_hidden_states = inputs.get("encoder_hidden_states", encoder_hidden_states)
+            encoder_attention_mask = inputs.get("encoder_hidden_mask", encoder_attention_mask)
+            use_cache = inputs.get("use_cache", use_cache)
+            output_attentions = inputs.get("output_attentions", output_attentions)
+            output_hidden_states = inputs.get("output_hidden_states", output_hidden_states)
+            return_dict = inputs.get("return_dict", return_dict)
+            assert len(inputs) <= 10, "Too many inputs."
         else:
             input_ids = inputs
 
-        if input_ids is not None and inputs_embeds is not None:
+        if input_ids is not None and input_ids is not None:
             raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
         elif input_ids is not None:
             input_shape = shape_list(input_ids)
-        elif inputs_embeds is not None:
-            input_shape = shape_list(inputs_embeds)[:-1]
+            input_ids = tf.reshape(input_ids, [-1, input_shape[-1]])
+        elif input_ids is not None:
+            input_shape = shape_list(input_ids)[:-1]
         else:
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
-        if attention_mask is None:
-            attention_mask = tf.fill(input_shape, 1)
-        if token_type_ids is None:
-            token_type_ids = tf.fill(input_shape, 0)
+        if past_key_values is None:
+            past_length = 0
+            past_key_values = [None] * len(self.h)
+        else:
+            past_length = shape_list(past_key_values[0][0])[-2]
 
-        extended_attention_mask = self.get_extended_attention_mask(attention_mask, input_shape)
-        head_mask = self.get_head_mask(head_mask)
+        if position_ids is None:
+            position_ids = tf.expand_dims(tf.range(past_length, input_shape[-1] + past_length), axis=0)
 
-        hidden_states = self.embeddings([input_ids, position_ids, token_type_ids, inputs_embeds], training=training)
+        if attention_mask is not None:
+            # We create a 3D attention mask from a 2D tensor mask.
+            # Sizes are [batch_size, 1, 1, to_seq_length]
+            # So we can broadcast to [batch_size, num_heads, from_seq_length, to_seq_length]
+            # this attention mask is more simple than the triangular masking of causal attention
+            # used in OpenAI GPT, we just need to prepare the broadcast dimension here.
+            attention_mask_shape = shape_list(attention_mask)
+            attention_mask = tf.reshape(
+                attention_mask, (attention_mask_shape[0], 1, 1, attention_mask_shape[1])
+            )
 
-        if hasattr(self, "embeddings_project"):
-            hidden_states = self.embeddings_project(hidden_states, training=training)
+            # Since attention_mask is 1.0 for positions we want to attend and 0.0 for
+            # masked positions, this operation will create a tensor which is 0.0 for
+            # positions we want to attend and -10000.0 for masked positions.
+            # Since we are adding it to the raw scores before the softmax, this is
+            # effectively the same as removing these entirely.
+            one_cst = tf.constant(1.0)
+            attention_mask = tf.cast(attention_mask, dtype=one_cst.dtype)
+            attention_mask = tf.multiply(
+                tf.subtract(one_cst, attention_mask), tf.constant(-10000.0)
+            )
 
-        hidden_states = self.encoder([hidden_states, extended_attention_mask, head_mask], training=training)
+        # Copied from `modeling_tf_t5.py` with -1e9 -> -10000
+        if self.config.add_cross_attention and encoder_attention_mask is not None:
+            # If a 2D ou 3D attention mask is provided for the cross-attention
+            # we need to make broadcastable to [batch_size, num_heads, mask_seq_length, mask_seq_length]
+            # we need to make broadcastable to [batch_size, num_heads, seq_length, seq_length]
+            encoder_attention_mask = tf.cast(
+                encoder_attention_mask, dtype=encoder_hidden_states.dtype
+            )
+            num_dims_encoder_attention_mask = len(shape_list(encoder_attention_mask))
+            if num_dims_encoder_attention_mask == 3:
+                encoder_extended_attention_mask = encoder_attention_mask[:, None, :, :]
+            if num_dims_encoder_attention_mask == 2:
+                encoder_extended_attention_mask = encoder_attention_mask[:, None, None, :]
 
-        return hidden_states
+            # T5 has a mask that can compare sequence ids, we can simulate this here with this transposition
+            # Cf. https://github.com/tensorflow/mesh/blob/8d2465e9bc93129b913b5ccc6a59aa97abd96ec6/mesh_tensorflow/transformer/transformer_layers.py#L270
+            # encoder_extended_attention_mask = tf.math.equal(encoder_extended_attention_mask,
+            #                                         tf.transpose(encoder_extended_attention_mask, perm=(-1, -2)))
+
+            encoder_extended_attention_mask = (1.0 - encoder_extended_attention_mask) * -10000.0
+        else:
+            encoder_extended_attention_mask = None
+
+        encoder_attention_mask = encoder_extended_attention_mask
+
+        # Prepare head mask if needed
+        # 1.0 in head_mask indicate we keep the head
+        # attention_probs has shape bsz x n_heads x N x N
+        # input head_mask has shape [num_heads] or [num_hidden_layers x num_heads]
+        # and head_mask is converted to shape [num_hidden_layers x batch x num_heads x seq_length x seq_length]
+        if head_mask is not None:
+            raise NotImplementedError
+        else:
+            head_mask= [None] * self.num_hidden_layers
+            # head_mask = tf.constant([0] * self.num_hidden_layers)
+
+        position_ids = tf.reshape(position_ids, [-1, shape_list(position_ids)[-1]])
+
+        if input_ids is None:
+            input_ids = self.wte(input_ids, mode="embedding")
+
+        position_embeds = tf.gather(self.wpe, position_ids)
+
+        if token_type_ids is not None:
+            token_type_ids = tf.reshape(
+                token_type_ids, [-1, shape_list(token_type_ids)[-1]]
+            )
+            token_type_embeds = self.wte(token_type_ids, mode="embedding")
+        else:
+            token_type_embeds = tf.constant(0.0)
+
+        position_embeds = tf.cast(position_embeds, dtype=input_ids.dtype)
+        token_type_embeds = tf.cast(token_type_embeds, dtype=input_ids.dtype)
+        hidden_states = input_ids + position_embeds + token_type_embeds
+        hidden_states = self.drop(hidden_states, training=training)
+
+        output_shape = input_shape + [shape_list(hidden_states)[-1]]
+
+        presents = () if use_cache else None
+        all_attentions = () if output_attentions else None
+        all_cross_attentions = () if output_attentions and self.config.add_cross_attention else None
+        all_hidden_states = () if output_hidden_states else None
+        for i, (block, layer_past) in enumerate(zip(self.h, past_key_values)):
+            if output_hidden_states:
+                all_hidden_states = all_hidden_states + (tf.reshape(hidden_states, output_shape),)
+
+            outputs = block(
+                hidden_states,
+                layer_past,
+                attention_mask,
+                head_mask[i],
+                encoder_hidden_states,
+                encoder_attention_mask,
+                use_cache,
+                output_attentions,
+                training=training,
+            )
+
+            hidden_states, present = outputs[:2]
+            if use_cache:
+                presents = presents + (present,)
+
+            if output_attentions:
+                all_attentions = all_attentions + (outputs[2],)
+                if self.config.add_cross_attention and encoder_hidden_states is not None:
+                    all_cross_attentions = all_cross_attentions + (outputs[3],)
+
+        hidden_states = self.ln_f(hidden_states)
+
+        hidden_states = tf.reshape(hidden_states, output_shape)
+        # Add last hidden state
+        if output_hidden_states:
+            all_hidden_states = all_hidden_states + (hidden_states,)
+
+        if output_attentions:
+            # let the number of heads free (-1) so we can extract attention even after head pruning
+            attention_output_shape = input_shape[:-1] + [-1] + shape_list(all_attentions[0])[-2:]
+            all_attentions = tuple(tf.reshape(t, attention_output_shape) for t in all_attentions)
+
+        if not return_dict:
+            return tuple(
+                v
+                for v in [hidden_states, presents, all_hidden_states, all_attentions, all_cross_attentions]
+                if v is not None
+            )
+
+        return TFBaseModelOutputWithPastAndCrossAttentions(
+            last_hidden_state=hidden_states,
+            past_key_values=presents,
+            hidden_states=all_hidden_states,
+            attentions=all_attentions,
+            cross_attentions=all_cross_attentions,
+        )
 
 
 ELECTRA_START_DOCSTRING = r"""
@@ -422,11 +594,12 @@ Even though both the discriminator and generator may be loaded into this model, 
 the only model of the two to have the correct classification head to be used for this model.""",
     ELECTRA_START_DOCSTRING,
 )
+# DONE
 class TFElectraForPreTraining(TFElectraPreTrainedModel):
     def __init__(self, config, **kwargs):
         super().__init__(config, **kwargs)
 
-        self.electra = GPT2for
+        self.electra = TFElectraMainLayer(config)
         self.discriminator_predictions = TFElectraDiscriminatorPredictions(config, name="discriminator_predictions")
 
     def get_input_embeddings(self):
@@ -525,19 +698,27 @@ class TFElectraForMaskedLM(TFElectraPreTrainedModel):
     def get_input_embeddings(self):
         return self.electra.embeddings
 
-    def get_output_embeddings(self):
-        return self.generator_lm_head
+    # def get_output_embeddings(self):
+    #     return self.generator_lm_head
 
     @add_start_docstrings_to_callable(ELECTRA_INPUTS_DOCSTRING)
     def call(
         self,
         input_ids=None,
+        past=None,
         attention_mask=None,
         token_type_ids=None,
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
+        encoder_hidden_states=None,
+        encoder_attention_mask=None,
+        use_cache=None,
+        output_attentions=None,
+        output_hidden_states=None,
+        return_dict=None,
         training=False,
+        **kwargs,
     ):
         r"""
     Returns:
@@ -567,10 +748,23 @@ class TFElectraForMaskedLM(TFElectraPreTrainedModel):
         prediction_scores = outputs[0]
 
         """
-
         generator_hidden_states = self.electra(
-            input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, training=training
+            input_ids=input_ids,
+            past=past,
+            attention_mask=attention_mask,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+            encoder_hidden_states=encoder_hidden_states,
+            encoder_attention_mask=encoder_attention_mask,
+            use_cache=use_cache,
+            output_attentions=output_attentions,
+            output_hidden_states=output_hidden_states,
+            return_dict=return_dict,
+            training=training,
         )
+        # missing some params
         generator_sequence_output = generator_hidden_states[0]
         prediction_scores = self.generator_predictions(generator_sequence_output, training=training)
         prediction_scores = self.generator_lm_head(prediction_scores, training=training)
@@ -600,15 +794,23 @@ class PretrainingModel(tf.keras.Model):
         super().__init__(**kwargs)
         # Set up model config
         self._config = config
-        self.disc_config = ElectraConfig(vocab_size=config.vocab_size,
-                                         embedding_size=config.embedding_size,
-                                         hidden_size=config.hidden_size,
-                                         num_hidden_layers=config.num_hidden_layers,
-                                         num_attention_heads=config.num_attention_heads,
-                                         intermediate_size=4*config.hidden_size,
-                                         hidden_act=config.act_func,
-                                         hidden_dropout_prob=config.hidden_dropout_prob,
-                                         attention_probs_dropout_prob=config.attention_probs_dropout_prob, )
+        self.disc_config = ElectraConfig(
+            vocab_size=config.vocab_size,
+            n_positions=config.n_positions,
+            # n_ctx=config.n_ctx,
+            n_embd=config.n_embd,
+            n_layer=config.n_layer,
+            n_head=config.n_head,
+            n_inner=config.n_inner,
+            activation_function=config.activation_function,
+            resid_pdrop=config.resid_pdrop,
+            embd_pdrop=config.embd_pdrop,
+            attn_pdrop=config.attn_pdrop,
+            layer_norm_epsilon=config.layer_norm_epsilon,
+            initializer_range=config.initializer_range,
+            scale_attn_weights=config.scale_attn_weights,
+            use_cache=config.use_cache
+        )
         self.disc_config.update({"amp": config.amp})
 
         # Set up discriminator
@@ -828,257 +1030,3 @@ class TFElectraForTokenClassification(TFElectraPreTrainedModel):
         return output  # (loss), scores, (hidden_states), (attentions)
 
 
-class TFPoolerStartLogits(tf.keras.Model):
-    """ Compute SQuAD start_logits from sequence hidden states. """
-
-    def __init__(self, config, *inputs, **kwargs):
-        super().__init__(*inputs, **kwargs)
-        self.dense = tf.keras.layers.Dense(
-            1, kernel_initializer=get_initializer(config.initializer_range), name="start_logit_pooler_dense"
-        )
-
-    def call(self, hidden_states, p_mask=None, next_layer_dtype=tf.float32):
-        """ Args:
-            **p_mask**: (`optional`) ``torch.FloatTensor`` of shape `(batch_size, seq_len)`
-                invalid position mask such as query and special symbols (PAD, SEP, CLS)
-                1.0 means token should be masked.
-        """
-        x = tf.squeeze(self.dense(hidden_states), axis=-1,
-                       name="squeeze_start_logit_pooler")
-
-        if p_mask is not None:
-            x = tf.cast(x, tf.float32) * (1 - p_mask) - 1e30 * p_mask
-
-        return x
-
-
-class TFPoolerEndLogits(tf.keras.Model):
-    """ Compute SQuAD end_logits from sequence hidden states and start token hidden state.
-    """
-
-    def __init__(self, config, *inputs, **kwargs):
-        super().__init__(*inputs, **kwargs)
-        self.dense_0 = tf.keras.layers.Dense(
-            config.hidden_size, kernel_initializer=get_initializer(config.initializer_range),
-            name="end_logit_pooler_dense_0"
-        )
-
-        self.activation = tf.keras.layers.Activation('tanh')  # nn.Tanh()
-        self.LayerNorm = tf.keras.layers.LayerNormalization(axis=-1, epsilon=config.layer_norm_eps,
-                                                            name="end_logit_pooler_LayerNorm")
-        self.dense_1 = tf.keras.layers.Dense(
-            1, kernel_initializer=get_initializer(config.initializer_range), name="end_logit_pooler_dense_1"
-        )
-
-    def call(self, hidden_states, start_states=None, start_positions=None, p_mask=None, training=False,
-             next_layer_dtype=tf.float32):
-        """ Args:
-            One of ``start_states``, ``start_positions`` should be not None.
-            If both are set, ``start_positions`` overrides ``start_states``.
-            **start_states**: ``torch.LongTensor`` of shape identical to hidden_states
-                hidden states of the first tokens for the labeled span.
-            **start_positions**: ``torch.LongTensor`` of shape ``(batch_size,)``
-                position of the first token for the labeled span:
-            **p_mask**: (`optional`) ``torch.FloatTensor`` of shape ``(batch_size, seq_len)``
-                Mask of invalid position such as query and special symbols (PAD, SEP, CLS)
-                1.0 means token should be masked.
-        """
-        assert (
-                start_states is not None or start_positions is not None
-        ), "One of start_states, start_positions should be not None"
-        if start_positions is not None and training:
-            bsz, slen, hsz = hidden_states.shape
-            start_states = tf.gather(hidden_states, start_positions[:, None], axis=1,
-                                     batch_dims=1)  # shape (bsz, 1, hsz)
-            start_states = tf.broadcast_to(start_states, (bsz, slen, hsz))  # shape (bsz, slen, hsz)
-
-        x = self.dense_0(tf.concat([hidden_states, start_states], axis=-1))
-        x = self.activation(x)
-        if training:
-            # since we are not doing beam search, add dimension with value=1. corresponds to dimension with top_k during inference - if not layernorm crashes
-            x = tf.expand_dims(x, axis=2)
-        x = self.LayerNorm(x)
-
-        if training:
-            # undo the additional dimension added above
-            x = tf.squeeze(self.dense_1(x), axis=[-1, -2])
-        else:
-            x = tf.squeeze(self.dense_1(x), axis=-1)
-
-        if p_mask is not None:
-            x = tf.cast(x, tf.float32) * (1 - p_mask) - 1e30 * p_mask
-
-        return x
-
-
-class TFPoolerAnswerClass(tf.keras.Model):
-    """ Compute SQuAD 2.0 answer class from classification and start tokens hidden states. """
-
-    def __init__(self, config, *inputs, **kwargs):
-        super().__init__(*inputs, **kwargs)
-        self.dense_0 = tf.keras.layers.Dense(
-            config.hidden_size, kernel_initializer=get_initializer(config.initializer_range),
-            name="pooler_answer_class_dense_0"
-        )
-
-        self.activation = tf.keras.layers.Activation('tanh')
-        self.dense_1 = tf.keras.layers.Dense(
-            1, use_bias=False, kernel_initializer=get_initializer(config.initializer_range),
-            name="pooler_answer_class_dense_1"
-        )
-
-    def call(self, hidden_states, start_states=None, start_positions=None, cls_index=None):
-        """
-        Args:
-            One of ``start_states``, ``start_positions`` should be not None.
-            If both are set, ``start_positions`` overrides ``start_states``.
-            **start_states**: ``torch.LongTensor`` of shape identical to ``hidden_states``.
-                hidden states of the first tokens for the labeled span.
-            **start_positions**: ``torch.LongTensor`` of shape ``(batch_size,)``
-                position of the first token for the labeled span.
-            **cls_index**: torch.LongTensor of shape ``(batch_size,)``
-                position of the CLS token. If None, take the last token.
-            note(Original repo):
-                no dependency on end_feature so that we can obtain one single `cls_logits`
-                for each sample
-        """
-        assert (
-                start_states is not None or start_positions is not None
-        ), "One of start_states, start_positions should be not None"
-        if start_positions is not None:
-            start_states = tf.gather(hidden_states, start_positions[:, None], axis=1,
-                                     batch_dims=1)  # shape (bsz, 1, hsz)
-            start_states = tf.squeeze(start_states, axis=1)  # shape (bsz, hsz)
-
-        if cls_index is not None:
-            cls_token_state = tf.gather(hidden_states, cls_index[:, None], axis=1, batch_dims=1)  # shape (bsz, 1, hsz)
-            cls_token_state = tf.squeeze(cls_token_state, axis=1)  # shape (bsz, hsz)
-        else:
-            cls_token_state = hidden_states[:, 0, :]  # shape (bsz, hsz)
-
-        x = self.dense_0(tf.concat([start_states, cls_token_state], axis=-1))
-        x = self.activation(x)
-        x = tf.squeeze(self.dense_1(x), axis=-1)
-
-        return x
-
-
-class TFElectraForQuestionAnswering(TFElectraPreTrainedModel):
-    def __init__(self, config, args):
-        super().__init__(config, args)
-
-        self.start_n_top = args.beam_size  # config.start_n_top
-        self.end_n_top = args.beam_size  # config.end_n_top
-        self.joint_head = args.joint_head
-        self.v2 = args.version_2_with_negative
-        self.electra = TFElectraMainLayer(config, name="electra")
-        self.num_hidden_layers = config.num_hidden_layers
-        self.amp = config.amp
-
-        ##old head
-        if not self.joint_head:
-            self.qa_outputs = tf.keras.layers.Dense(
-                2, kernel_initializer=get_initializer(config.initializer_range), name="qa_outputs")
-        else:
-            self.start_logits = TFPoolerStartLogits(config, name='start_logits')
-            self.end_logits = TFPoolerEndLogits(config, name='end_logits')
-            if self.v2:
-                self.answer_class = TFPoolerAnswerClass(config, name='answer_class')
-
-    def call(
-            self,
-            input_ids=None,
-            attention_mask=None,
-            token_type_ids=None,
-            start_positions=None,
-            end_positions=None,
-            cls_index=None,
-            p_mask=None,
-            is_impossible=None,
-            position_ids=None,
-            head_mask=None,
-            inputs_embeds=None,
-            training=False,
-    ):
-        outputs = self.electra(
-            input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, training=training
-        )
-        discriminator_sequence_output = outputs[0]
-
-        # Simple head model
-        if not self.joint_head:
-            logits = self.qa_outputs(discriminator_sequence_output)
-            [start_logits, end_logits] = tf.split(logits, 2, axis=-1)
-            start_logits = tf.squeeze(start_logits, axis=-1, name="squeeze_start_logit")
-            end_logits = tf.squeeze(end_logits, axis=-1, name="squeeze_end_logit")
-            outputs = (start_logits, end_logits) + outputs
-            return outputs
-
-        start_logits = self.start_logits(discriminator_sequence_output, p_mask=p_mask,
-                                         next_layer_dtype=self.end_logits.dense_0.dtype)
-        if training:  # start_positions is not None and end_positions is not None:
-
-            # during training, compute the end logits based on the ground truth of the start position
-            end_logits = self.end_logits(discriminator_sequence_output, start_positions=start_positions, p_mask=p_mask,
-                                         training=training,
-                                         next_layer_dtype=tf.float16 if self.amp else tf.float32)
-
-            if self.v2:  # cls_index is not None:#cls_index is not None and is_impossible is not None:
-                # Predict answerability from the representation of CLS and START
-                cls_logits = self.answer_class(discriminator_sequence_output, start_positions=start_positions,
-                                               cls_index=cls_index)
-
-            else:
-                cls_logits = None
-
-            outputs = (start_logits, end_logits, cls_logits) + outputs
-
-        else:
-            # during inference, compute the end logits based on beam search
-            bsz, slen, hsz = discriminator_sequence_output.shape
-            start_n_top = min(self.start_n_top, slen)
-            end_n_top = min(self.end_n_top, slen)
-            start_log_probs = tf.nn.log_softmax(start_logits, axis=-1, name="start_logit_softmax")  # shape (bsz, slen)
-
-            start_top_log_probs, start_top_index = tf.math.top_k(start_log_probs, k=start_n_top,
-                                                                 name="start_log_probs_top_k")
-
-            start_states = tf.gather(discriminator_sequence_output, start_top_index, axis=1,
-                                     batch_dims=1)  # shape (bsz, start_n_top, hsz)
-            start_states = tf.broadcast_to(tf.expand_dims(start_states, axis=1),
-                                           [bsz, slen, start_n_top, hsz])  # shape (bsz, slen, start_n_top, hsz)
-
-            discriminator_sequence_output_expanded = tf.broadcast_to(
-                tf.expand_dims(discriminator_sequence_output, axis=2),
-                list(start_states.shape))  # shape (bsz, slen, start_n_top, hsz)
-
-            p_mask = tf.expand_dims(p_mask, axis=-1) if p_mask is not None else None
-            end_logits = self.end_logits(discriminator_sequence_output_expanded, start_states=start_states,
-                                         p_mask=p_mask, next_layer_dtype=tf.float16 if self.amp else tf.float32)  # self.answer_class.dense_0.dtype)
-            end_log_probs = tf.nn.log_softmax(end_logits, axis=1,
-                                              name="end_logit_softmax")  # shape (bsz, slen, start_n_top)
-
-            # need to transpose because tf.math.top_k works on default axis=-1
-            end_log_probs = tf.transpose(end_log_probs, perm=[0, 2, 1])
-            end_top_log_probs, end_top_index = tf.math.top_k(
-                end_log_probs, k=end_n_top)  # shape (bsz, end_n_top, start_n_top).perm(0,2,1)
-            end_top_log_probs = tf.reshape(end_top_log_probs, (
-                -1, start_n_top * end_n_top))  # shape (bsz, self.start_n_top * self.end_n_top)
-            end_top_index = tf.reshape(end_top_index,
-                                       (-1, start_n_top * end_n_top))  # shape (bsz, self.start_n_top * self.end_n_top)
-            if self.v2:  # cls_index is not None:
-                start_p = tf.nn.softmax(start_logits, axis=-1, name="start_softmax")
-                start_states = tf.einsum(
-                    "blh,bl->bh", discriminator_sequence_output, tf.cast(start_p, tf.float16) if self.amp else start_p
-                )  # get the representation of START as weighted sum of hidden states
-                # explicitly setting cls_index to None
-                cls_logits = self.answer_class(
-                    discriminator_sequence_output, start_states=start_states, cls_index=None)
-                # one single `cls_logits` for each sample
-            else:
-                cls_logits = tf.fill([bsz], 0.0)
-
-            outputs = (start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits) + outputs
-
-        # return start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits
-        return outputs
