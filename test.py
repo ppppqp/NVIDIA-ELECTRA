@@ -166,7 +166,7 @@ class PretrainingConfig(object):
             if v is not None:
                 self.__dict__[k] = v
 
-def train_one_step(config, model, optimizer, features, accumulator, first_step, take_step, clip_norm=1.0):
+def train_one_step(config, model, optimizer, features, past, accumulator, first_step, take_step, clip_norm=1.0):
 
     #Forward and Backward pass
     with tf.GradientTape() as tape:
@@ -368,14 +368,16 @@ def main():
     train_start, start_step = time.time(), int(checkpoint.step) - 1
     local_step = 0
     saved_ckpt = False
+    # past = tf.zeros([config.train_batch_size, 19])
+    # past_arr = tf.TensorArray(tf.float32,)
     while int(checkpoint.step) <= config.num_train_steps:
         saved_ckpt = False
         step = int(checkpoint.step)
         features = next(train_iterator)
         iter_start = time.time()
-
+        past = None
         # if step == 200: tf.profiler.experimental.start(logdir=train_log_dir)
-        total_loss, eval_fn_inputs = train_one_step(config, model, optimizer, features, accumulator,
+        total_loss, eval_fn_inputs = train_one_step(config, model, optimizer, features, past, accumulator,
                                                     local_step==1, take_step=local_step % args.gradient_accumulation_steps == 0)
         # if step == 300: tf.profiler.experimental.stop()
 
