@@ -330,7 +330,7 @@ To run pre-training on multiple nodes, see the [Multi-node](#multi-node) section
 The above pretrained ELECTRA model representations can be fine-tuned with just one additional output layer for a state-of-the-art question answering system. Running the following script extracts and saves the discriminator and generator from the pretrained checkpoint and fine-tunes the discriminator on SQuAD:
  
 ```
-checkpoints=results/models/base/checkpoints bash scripts/finetune_ckpts_on_squad.sh
+checkpoints=results/base/checkpoints bash scripts/finetune_ckpts_on_squad.sh
 ```
 
 It internally runs `postprocess_pretrained_ckpt.py` which extracts and saves the discriminator and the generator from the pretrained checkpoint.

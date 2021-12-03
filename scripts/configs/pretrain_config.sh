@@ -14,14 +14,15 @@
 # limitations under the License.
 
 # Full  pretraining configs for NVIDIA DGX-A100 (8x NVIDIA A100 40GB GPU)
+# bash scripts/run_pretraining.sh $(source scripts/configs/pretrain_config.sh && rtx3090_1gpu_amp)
 rtx3090_1gpu_amp (){
-    train_batch_size_p1="176"
+    train_batch_size_p1="88"
     learning_rate_p1="6e-3"
     precision="amp"
     xla="xla"
     num_gpus=1
-    warmup_steps_p1="2000"
-    train_steps_p1=10000
+    warmup_steps_p1="1"
+    train_steps_p1=1
     save_checkpoint_steps=500
     resume_training="false"
     optimizer="lamb"
@@ -31,8 +32,8 @@ rtx3090_1gpu_amp (){
     job_name="electra_lamb_pretraining"
     train_batch_size_p2=24
     learning_rate_p2="4e-3"
-    warmup_steps_p2="200"
-    train_steps_p2=933
+    warmup_steps_p2="1"
+    train_steps_p2=1
     gradient_accumulation_steps_p2=144
     electra_model="base"
     echo $train_batch_size_p1 $learning_rate_p1 $precision $num_gpus $xla \

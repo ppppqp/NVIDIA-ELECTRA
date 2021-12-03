@@ -315,19 +315,13 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
             output_attentions = inputs.get("output_attentions", output_attentions)
             output_hidden_states = inputs.get("output_hidden_states", output_hidden_states)
             return_dict = inputs.get("return_dict", return_dict)
-            assert len(inputs) <= 10, "Too many inputs."
+            assert len(inputs) <= 13, "Too many inputs."
         else:
             input_ids = inputs
 
-        if input_ids is not None and input_ids is not None:
-            raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
-        elif input_ids is not None:
+        if input_ids is not None:
             input_shape = shape_list(input_ids)
             input_ids = tf.reshape(input_ids, [-1, input_shape[-1]])
-        elif input_ids is not None:
-            input_shape = shape_list(input_ids)[:-1]
-        else:
-            raise ValueError("You have to specify either input_ids or inputs_embeds")
 
         if past_key_values is None:
             past_length = 0
@@ -643,9 +637,22 @@ class TFElectraForPreTraining(TFElectraPreTrainedModel):
         outputs = model(input_ids)
         scores = outputs[0]
         """
-
+        # FIXME:
         discriminator_hidden_states = self.electra(
-            input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, training=training
+            input_ids,
+            None,
+            attention_mask,
+            token_type_ids,
+            position_ids,
+            head_mask,
+            inputs_embeds,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            training=training,
         )
         discriminator_sequence_output = discriminator_hidden_states[0]
         logits = self.discriminator_predictions(discriminator_sequence_output)
@@ -749,19 +756,19 @@ class TFElectraForMaskedLM(TFElectraPreTrainedModel):
 
         """
         generator_hidden_states = self.electra(
-            input_ids=input_ids,
-            past=past,
-            attention_mask=attention_mask,
-            token_type_ids=token_type_ids,
-            position_ids=position_ids,
-            head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-            encoder_hidden_states=encoder_hidden_states,
-            encoder_attention_mask=encoder_attention_mask,
-            use_cache=use_cache,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            input_ids,
+            past,
+            attention_mask,
+            token_type_ids,
+            position_ids,
+            head_mask,
+            inputs_embeds,
+            encoder_hidden_states,
+            encoder_attention_mask,
+            use_cache,
+            output_attentions,
+            output_hidden_states,
+            return_dict,
             training=training,
         )
         # missing some params
@@ -829,7 +836,7 @@ class PretrainingModel(tf.keras.Model):
         else:
             self.generator = TFElectraForMaskedLM(self.disc_config)
 
-    def call(self, features, is_training):
+    def call(self, features, past, is_training):
         config = self._config
 
         # Mask the input
@@ -841,7 +848,7 @@ class PretrainingModel(tf.keras.Model):
             mlm_output = self._get_masked_lm_output(masked_inputs, None, is_training=is_training)
         else:
             mlm_output = self._get_masked_lm_output(
-                masked_inputs, self.generator, is_training=is_training)
+                masked_inputs, self.generator, past, is_training=is_training)
         fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
         total_loss = config.gen_weight * mlm_output.loss
 
@@ -872,9 +879,9 @@ class PretrainingModel(tf.keras.Model):
                                             output_type=tf.int32)
             })
 
-        return total_loss, eval_fn_inputs
+        return total_loss, eval_fn_inputs, mlm_output.preds
 
-    def _get_masked_lm_output(self, inputs, generator, is_training=False):
+    def _get_masked_lm_output(self, inputs, generator, past, is_training=False):
         """Masked language modeling softmax layer."""
         masked_lm_weights = inputs.masked_lm_weights
 
@@ -886,8 +893,10 @@ class PretrainingModel(tf.keras.Model):
             logits_tiled += tf.reshape(logits, [1, 1, self.disc_config.vocab_size])
             logits = logits_tiled
         else:
+            #FIXME:
             outputs = generator(
                 input_ids=inputs.input_ids,
+                # past_key_values = past,
                 attention_mask=inputs.input_mask,
                 token_type_ids=inputs.segment_ids,
                 training=is_training)
