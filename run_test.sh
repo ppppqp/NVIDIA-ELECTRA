@@ -1,13 +1,13 @@
 #!/bin/bash
 
 echo "Container nvidia build = " $NVIDIA_BUILD_ID
-train_batch_size_p1=${1:-176}
+train_batch_size_p1=${1:-44}
 learning_rate_p1=${2:-"6e-3"}
 precision=${3:-"amp"}
 num_gpus=${4:-1}
 xla=${5:-"xla"}
-warmup_steps_p1=${6:-"1"}
-train_steps_p1=${7:-1}
+warmup_steps_p1=${6:-"500"}
+train_steps_p1=${7:-500}
 save_checkpoint_steps=${8:-500}
 resume_training=${9:-"false"}
 optimizer=${10:-"lamb"}

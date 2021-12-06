@@ -13,7 +13,7 @@ class ElectraConfig(PretrainedConfig):
     def __init__(
         self,
         # GPT-2 config
-        vocab_size=50257,
+        vocab_size=30522,
         n_positions=1024,
         n_ctx=1024,
         n_embd=768,
@@ -28,11 +28,10 @@ class ElectraConfig(PretrainedConfig):
         initializer_range=0.02,
         scale_attn_weights=True,
         use_cache=True,
-        bos_token_id=50256,
-        eos_token_id=50256,
+        bos_token_id=30522,
+        eos_token_id=30522,
         scale_attn_by_inverse_layer_idx=False,
         reorder_and_upcast_attn=False,
-        embedding_size = 128,
         **kwargs,
     ):
         self.vocab_size = vocab_size
@@ -62,11 +61,11 @@ class ElectraConfig(PretrainedConfig):
         self.num_hidden_layers = self.n_layer
         self.num_attention_heads = self.n_head
         self.hidden_size = self.n_embd
-        self.embedding_size = embedding_size
-        self.type_vocab_size = 2,
+        self.embedding_size = self.n_embd
+        self.type_vocab_size = 2
         self.layer_norm_eps = self.layer_norm_epsilon
         self.hidden_dropout_prob = self.embd_pdrop
-        self.hidden_act=self.activation_function,
+        self.hidden_act=self.activation_function
         # some extra
         self.add_cross_attention = False
 

@@ -9,9 +9,10 @@ import tensorflow as tf
 import horovod.tensorflow as hvd
 from horovod.tensorflow.compression import Compression
 from gpu_affinity import set_affinity
-
+from matplotlib import pyplot as plt
 import utils
 import sys
+import numpy as np
 import pretrain_utils
 from utils import get_rank, get_world_size, is_main_process, log, log_config, setup_logger, postprocess_dllog
 from tokenization import ElectraTokenizer
@@ -52,7 +53,7 @@ class PretrainingConfig(object):
         self.learning_rate = 5e-4
         self.lr_decay_power = 0.5
         self.weight_decay_rate = 0.01
-        self.num_warmup_steps = 10000
+        self.num_warmup_steps = 1
         self.opt_beta_1 = 0.878
         self.opt_beta_2 = 0.974
         self.end_lr = 0.0
@@ -61,7 +62,8 @@ class PretrainingConfig(object):
         self.log_freq = 10
         self.skip_checkpoint = False
         self.save_checkpoints_steps = 1000
-        self.num_train_steps = 1000000
+        # self.num_train_steps = 1000000
+        self.num_train_steps = 1
         self.num_eval_steps = 100
         self.keep_checkpoint_max = 5  # maximum number of recent checkpoint files to keep;  change to 0 or None to keep all checkpoints
         self.restore_checkpoint = None
@@ -82,8 +84,8 @@ class PretrainingConfig(object):
         # GPT config
         self.n_positions=1024
         self.n_embd=768
-        self.n_layer=12
-        self.n_head=12
+        self.n_layer=4
+        self.n_head=4
         self.n_inner=None
         self.activation_function="gelu_new"
         self.resid_pdrop=0.1
@@ -165,12 +167,42 @@ class PretrainingConfig(object):
         for k, v in kwargs.items():
             if v is not None:
                 self.__dict__[k] = v
+def metric_fn(config, metrics, eval_fn_inputs):
+    """Computes the loss and accuracy of the model."""
+    d = eval_fn_inputs
+    metrics["masked_lm_accuracy"].update_state(
+        y_true=tf.reshape(d["masked_lm_ids"], [-1]),
+        y_pred=tf.reshape(d["masked_lm_preds"], [-1]),
+        sample_weight=tf.reshape(d["masked_lm_weights"], [-1]))
+    metrics["masked_lm_loss"].update_state(
+        values=tf.reshape(d["mlm_loss"], [-1]),
+        sample_weight=tf.reshape(d["masked_lm_weights"], [-1]))
+    if config.electra_objective:
+        metrics["sampled_masked_lm_accuracy"].update_state(
+            y_true=tf.reshape(d["masked_lm_ids"], [-1]),
+            y_pred=tf.reshape(d["sampled_tokids"], [-1]),
+            sample_weight=tf.reshape(d["masked_lm_weights"], [-1]))
+        if config.disc_weight > 0:
+            metrics["disc_loss"].update_state(d["disc_loss"])
+            #metrics["disc_auc"].update_state(
+            #    d["disc_labels"] * d["input_mask"],
+            #    d["disc_probs"] * tf.cast(d["input_mask"], tf.float32))
+            metrics["disc_accuracy"].update_state(
+                y_true=d["disc_labels"], y_pred=d["disc_preds"],
+                sample_weight=d["input_mask"])
+            metrics["disc_precision"].update_state(
+                y_true=d["disc_labels"], y_pred=d["disc_preds"],
+                sample_weight=d["disc_preds"] * d["input_mask"])
+            metrics["disc_recall"].update_state(
+                y_true=d["disc_labels"], y_pred=d["disc_preds"],
+                sample_weight=d["disc_labels"] * d["input_mask"])
+    return metrics
 
 def train_one_step(config, model, optimizer, features, past, accumulator, first_step, take_step, clip_norm=1.0):
 
     #Forward and Backward pass
     with tf.GradientTape() as tape:
-        total_loss, eval_fn_inputs = model(features, is_training=True)
+        total_loss, eval_fn_inputs = model(features, None, is_training=True)
         unscaled_loss = tf.stop_gradient(total_loss)
         if config.amp:
             total_loss = optimizer.get_scaled_loss(total_loss)
@@ -206,7 +238,7 @@ def train_one_step(config, model, optimizer, features, past, accumulator, first_
 
     return unscaled_loss, eval_fn_inputs
 
-def main():
+def main(e2e_start_time):
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", required=True)
     parser.add_argument("--model_size", default="base", type=str, help="base or large")
@@ -254,7 +286,7 @@ def main():
     if config.vocab_size % 8 != 0:
         config.vocab_size += 8 - (config.vocab_size % 8)
     hvd.init()
-    # setup_logger(args)
+    setup_logger(args)
     set_affinity(hvd.local_rank())
     gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpus:
@@ -302,6 +334,7 @@ def main():
     dataset = pretrain_utils.get_dataset(
         config, config.train_batch_size, world_size=get_world_size(), rank=get_rank())
     train_iterator = iter(dataset)
+    print("dataset setup")
     optimizer = create_optimizer(
         init_lr=config.learning_rate,
         num_train_steps=config.num_train_steps,
@@ -370,6 +403,12 @@ def main():
     saved_ckpt = False
     # past = tf.zeros([config.train_batch_size, 19])
     # past_arr = tf.TensorArray(tf.float32,)
+    total_loss_record = []
+    mlm_loss_record = []
+    disc_loss_record = []
+    mlm_acc_record = []
+    disc_acc_record = []
+    initial_step = int(checkpoint.step)
     while int(checkpoint.step) <= config.num_train_steps:
         saved_ckpt = False
         step = int(checkpoint.step)
@@ -377,6 +416,7 @@ def main():
         iter_start = time.time()
         past = None
         # if step == 200: tf.profiler.experimental.start(logdir=train_log_dir)
+        # print("before training one step")
         total_loss, eval_fn_inputs = train_one_step(config, model, optimizer, features, past, accumulator,
                                                     local_step==1, take_step=local_step % args.gradient_accumulation_steps == 0)
         # if step == 300: tf.profiler.experimental.stop()
@@ -389,6 +429,11 @@ def main():
         if (step % args.log_freq == 0) and (local_step % args.gradient_accumulation_steps == 0):
             log_info_dict = {k:float(v.result().numpy() * 100) if "accuracy" in k else float(v.result().numpy()) for k, v in metrics.items()}
             dllogger.log(step=(step,), data=log_info_dict, verbosity=0)
+            total_loss_record.append(float(log_info_dict['total_loss']))
+            mlm_loss_record.append(log_info_dict['masked_lm_loss'])
+            disc_loss_record.append(log_info_dict['disc_loss'])
+            mlm_acc_record.append(log_info_dict['masked_lm_accuracy'])
+            disc_acc_record.append(log_info_dict['disc_accuracy'])
             log('Step:{step:6d}, Loss:{total_loss:10.6f}, Gen_loss:{masked_lm_loss:10.6f}, Disc_loss:{disc_loss:10.6f}, Gen_acc:{masked_lm_accuracy:6.2f}, '
                 'Disc_acc:{disc_accuracy:6.2f}, Perf:{train_perf:4.0f}, Loss Scaler: {loss_scale}, Elapsed: {elapsed}, ETA: {eta}, '.format(
                 step=step, **log_info_dict,
@@ -438,8 +483,23 @@ def main():
             log(" ** Saved model checkpoint for step {}: {}".format(step, save_path))
         iter_save_path = iter_manager.save(checkpoint_number=step)
         log(" ** Saved iterator checkpoint for step {}: {}".format(step, iter_save_path), all_rank=True)
-
+    t = np.array(range(len(total_loss_record)))
+    print(total_loss_record)
+    plt.plot(t,total_loss_record, label='total loss')
+    plt.plot(t,mlm_loss_record, label='mlm loss')
+    plt.plot(t, disc_loss_record, label = 'disc loss')
+    plt.title('Loss Plot')
+    plt.legend()
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.savefig("loss_plot.png")
+    # plt.plot(t,mlm_acc_record)
+    # plt.plot(t,disc_acc_record)
+    # plt.savefig("acc_plot.png")
     return args
 if __name__ == "__main__":
-    # start_time = time.time()
-    main()
+    start_time = time.time()
+    args = main(start_time)
+    log("Total Time:{:.4f}".format(time.time() - start_time))
+    if is_main_process():
+        postprocess_dllog(args)

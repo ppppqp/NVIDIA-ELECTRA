@@ -48,7 +48,6 @@ class TFElectraEmbeddings(tf.keras.layers.Layer):
         self.vocab_size = config.vocab_size
         self.embedding_size = config.embedding_size
         self.initializer_range = config.initializer_range
-
         self.position_embeddings = tf.keras.layers.Embedding(
             config.max_position_embeddings,
             config.embedding_size,
@@ -61,7 +60,6 @@ class TFElectraEmbeddings(tf.keras.layers.Layer):
             embeddings_initializer=get_initializer(self.initializer_range),
             name="token_type_embeddings",
         )
-
         # self.LayerNorm is not snake-cased to stick with TensorFlow model variable name and be able to load
         # any TensorFlow checkpoint file
         self.LayerNorm = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="LayerNorm")
@@ -116,7 +114,6 @@ class TFElectraEmbeddings(tf.keras.layers.Layer):
             position_ids = tf.range(seq_length, dtype=tf.int32)[tf.newaxis, :]
         if token_type_ids is None:
             token_type_ids = tf.fill(input_shape, 0)
-
         if inputs_embeds is None:
             inputs_embeds = tf.gather(self.word_embeddings, input_ids)
         position_embeddings = self.position_embeddings(position_ids)
@@ -223,7 +220,6 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
 
     def __init__(self, config, shared_embeddings=False, input_embeddings=None, **kwargs):
         super().__init__(config, **kwargs)
-
         if shared_embeddings and input_embeddings is not None:
             self.wte = input_embeddings
         else:
@@ -250,6 +246,14 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
         self.h = [TFBlock(config, scale=True, name=f"h_._{i}") for i in range(config.n_layer)]
         self.ln_f = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_epsilon, name="ln_f")
 
+    def build(self, input_shape):
+        with tf.name_scope("wpe"):
+            self.wpe = self.add_weight(
+                name="embeddings",
+                shape=[self.n_positions, self.n_embd],
+                initializer=get_initializer(self.initializer_range),
+            )
+        # super().build(input_shape)
 
     def get_input_embeddings(self):
         return self.embeddings
@@ -266,7 +270,7 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
 
     def call(
         self,
-        inputs,
+        # inputs,
         input_ids=None,
         past_key_values=None,
         attention_mask=None,
@@ -283,41 +287,41 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
         training=False,
         **kwargs,
     ):
-        if isinstance(inputs, (tuple, list)):
-            # FIXME!
-            input_ids = inputs[0]
-            past_key_values = inputs[1] if len(inputs) > 1 else past_key_values
-            attention_mask = inputs[2] if len(inputs) > 2 else attention_mask
-            token_type_ids = inputs[3] if len(inputs) > 3 else token_type_ids
-            position_ids = inputs[4] if len(inputs) > 4 else position_ids
-            head_mask=inputs[5] if len(inputs) > 5 else position_ids
-            inputs_embeds = inputs[6] if len(inputs) > 6 else inputs_embeds
-            encoder_hidden_states = inputs[7] if len(inputs) > 7 else encoder_hidden_states
-            encoder_attention_mask = inputs[8] if len(inputs) > 8 else encoder_attention_mask
-            use_cache = inputs[9] if len(inputs) > 9 else use_cache
-            output_attentions = inputs[10] if len(inputs) > 10 else output_attentions
-            output_hidden_states = inputs[11] if len(inputs) > 11 else output_hidden_states
-            return_dict = inputs[12] if len(inputs) > 12 else return_dict
+        # if isinstance(inputs, (tuple, list)):
+        #     # FIXME!
+        #     input_ids = inputs[0]
+        #     past_key_values = inputs[1] if len(inputs) > 1 else past_key_values
+        #     attention_mask = inputs[2] if len(inputs) > 2 else attention_mask
+        #     token_type_ids = inputs[3] if len(inputs) > 3 else token_type_ids
+        #     position_ids = inputs[4] if len(inputs) > 4 else position_ids
+        #     head_mask=inputs[5] if len(inputs) > 5 else position_ids
+        #     inputs_embeds = inputs[6] if len(inputs) > 6 else inputs_embeds
+        #     encoder_hidden_states = inputs[7] if len(inputs) > 7 else encoder_hidden_states
+        #     encoder_attention_mask = inputs[8] if len(inputs) > 8 else encoder_attention_mask
+        #     use_cache = inputs[9] if len(inputs) > 9 else use_cache
+        #     output_attentions = inputs[10] if len(inputs) > 10 else output_attentions
+        #     output_hidden_states = inputs[11] if len(inputs) > 11 else output_hidden_states
+        #     return_dict = inputs[12] if len(inputs) > 12 else return_dict
 
-            assert len(inputs) <= 13, "Too many inputs."
-        elif isinstance(inputs, (dict, BatchEncoding)):
-            # FIXME!
-            input_ids = inputs.get("input_ids")
-            past_key_values = inputs.get("past_key_values", attention_mask)
-            attention_mask = inputs.get("attention_mask", attention_mask)
-            token_type_ids = inputs.get("token_type_ids", token_type_ids)
-            position_ids = inputs.get("position_ids", position_ids)
-            head_mask = inputs.get("head_mask", head_mask)
-            inputs_embeds = inputs.get("inputs_embeds", inputs_embeds)
-            encoder_hidden_states = inputs.get("encoder_hidden_states", encoder_hidden_states)
-            encoder_attention_mask = inputs.get("encoder_hidden_mask", encoder_attention_mask)
-            use_cache = inputs.get("use_cache", use_cache)
-            output_attentions = inputs.get("output_attentions", output_attentions)
-            output_hidden_states = inputs.get("output_hidden_states", output_hidden_states)
-            return_dict = inputs.get("return_dict", return_dict)
-            assert len(inputs) <= 13, "Too many inputs."
-        else:
-            input_ids = inputs
+        #     assert len(inputs) <= 13, "Too many inputs."
+        # elif isinstance(inputs, (dict, BatchEncoding)):
+        #     # FIXME!
+        #     input_ids = inputs.get("input_ids")
+        #     past_key_values = inputs.get("past_key_values", attention_mask)
+        #     attention_mask = inputs.get("attention_mask", attention_mask)
+        #     token_type_ids = inputs.get("token_type_ids", token_type_ids)
+        #     position_ids = inputs.get("position_ids", position_ids)
+        #     head_mask = inputs.get("head_mask", head_mask)
+        #     inputs_embeds = inputs.get("inputs_embeds", inputs_embeds)
+        #     encoder_hidden_states = inputs.get("encoder_hidden_states", encoder_hidden_states)
+        #     encoder_attention_mask = inputs.get("encoder_hidden_mask", encoder_attention_mask)
+        #     use_cache = inputs.get("use_cache", use_cache)
+        #     output_attentions = inputs.get("output_attentions", output_attentions)
+        #     output_hidden_states = inputs.get("output_hidden_states", output_hidden_states)
+        #     return_dict = inputs.get("return_dict", return_dict)
+        #     assert len(inputs) <= 13, "Too many inputs."
+        # else:
+        #     input_ids = inputs
 
         if input_ids is not None:
             input_shape = shape_list(input_ids)
@@ -392,22 +396,22 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
 
         position_ids = tf.reshape(position_ids, [-1, shape_list(position_ids)[-1]])
 
-        if input_ids is None:
-            input_ids = self.wte(input_ids, mode="embedding")
+        # if input_ids is None:
+        #     input_ids = self.wte(input_ids, mode="embedding")
 
-        position_embeds = tf.gather(self.wpe, position_ids)
+        # position_embeds = tf.gather(self.wpe, position_ids)
 
-        if token_type_ids is not None:
-            token_type_ids = tf.reshape(
-                token_type_ids, [-1, shape_list(token_type_ids)[-1]]
-            )
-            token_type_embeds = self.wte(token_type_ids, mode="embedding")
-        else:
-            token_type_embeds = tf.constant(0.0)
+        # if token_type_ids is not None:
+        #     token_type_ids = tf.reshape(
+        #         token_type_ids, [-1, shape_list(token_type_ids)[-1]]
+        #     )
+        #     token_type_embeds = self.wte(token_type_ids, mode="embedding")
+        # else:
+        #     token_type_embeds = tf.constant(0.0)
 
-        position_embeds = tf.cast(position_embeds, dtype=input_ids.dtype)
-        token_type_embeds = tf.cast(token_type_embeds, dtype=input_ids.dtype)
-        hidden_states = input_ids + position_embeds + token_type_embeds
+        # position_embeds = tf.cast(position_embeds, dtype=input_ids.dtype)
+        # token_type_embeds = tf.cast(token_type_embeds, dtype=input_ids.dtype)
+        hidden_states = self.wte([input_ids, position_ids,token_type_ids,None])
         hidden_states = self.drop(hidden_states, training=training)
 
         output_shape = input_shape + [shape_list(hidden_states)[-1]]
@@ -756,19 +760,19 @@ class TFElectraForMaskedLM(TFElectraPreTrainedModel):
 
         """
         generator_hidden_states = self.electra(
-            input_ids,
-            past,
-            attention_mask,
-            token_type_ids,
-            position_ids,
-            head_mask,
-            inputs_embeds,
-            encoder_hidden_states,
-            encoder_attention_mask,
-            use_cache,
-            output_attentions,
-            output_hidden_states,
-            return_dict,
+            input_ids = input_ids,
+            past_key_values = None,
+            attention_mask = attention_mask,
+            token_type_ids = token_type_ids,
+            position_ids = position_ids,
+            head_mask = head_mask,
+            inputs_embeds = inputs_embeds,
+            encoder_hidden_states = encoder_hidden_states,
+            encoder_attention_mask = encoder_attention_mask,
+            use_cache = use_cache,
+            output_attentions = output_attentions,
+            output_hidden_states = output_hidden_states,
+            return_dict = return_dict,
             training=training,
         )
         # missing some params
@@ -838,11 +842,9 @@ class PretrainingModel(tf.keras.Model):
 
     def call(self, features, past, is_training):
         config = self._config
-
         # Mask the input
         masked_inputs = pretrain_utils.mask(
             config, pretrain_utils.features_to_inputs(features), config.mask_prob)
-
         # Generator
         if config.uniform_generator:
             mlm_output = self._get_masked_lm_output(masked_inputs, None, is_training=is_training)
@@ -879,7 +881,7 @@ class PretrainingModel(tf.keras.Model):
                                             output_type=tf.int32)
             })
 
-        return total_loss, eval_fn_inputs, mlm_output.preds
+        return total_loss, eval_fn_inputs
 
     def _get_masked_lm_output(self, inputs, generator, past, is_training=False):
         """Masked language modeling softmax layer."""
@@ -896,7 +898,7 @@ class PretrainingModel(tf.keras.Model):
             #FIXME:
             outputs = generator(
                 input_ids=inputs.input_ids,
-                # past_key_values = past,
+                past_key_values = None,
                 attention_mask=inputs.input_mask,
                 token_type_ids=inputs.segment_ids,
                 training=is_training)
@@ -907,7 +909,6 @@ class PretrainingModel(tf.keras.Model):
         oh_labels = tf.one_hot(
             inputs.masked_lm_ids, depth=self.disc_config.vocab_size,
             dtype=tf.float32)
-
         probs = tf.cast(tf.nn.softmax(logits), tf.float32)
         log_probs = tf.cast(tf.nn.log_softmax(logits), tf.float32)
         label_log_probs = -tf.reduce_sum(log_probs * oh_labels, axis=-1)
