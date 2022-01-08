@@ -16,13 +16,13 @@
 # Full  pretraining configs for NVIDIA DGX-A100 (8x NVIDIA A100 40GB GPU)
 # bash scripts/run_pretraining.sh $(source scripts/configs/pretrain_config.sh && rtx3090_1gpu_amp)
 rtx3090_1gpu_amp (){
-    train_batch_size_p1="88"
+    train_batch_size_p1="44"
     learning_rate_p1="6e-3"
     precision="amp"
     xla="xla"
     num_gpus=1
-    warmup_steps_p1="1"
-    train_steps_p1=1
+    warmup_steps_p1="500"
+    train_steps_p1=10000
     save_checkpoint_steps=500
     resume_training="false"
     optimizer="lamb"

@@ -18,7 +18,7 @@ ELECTRA_DIR=/data/electra_research/NVIDIA-ELECTRA
 NV_VISIBLE_DEVICES=${2:-"all"}
 DOCKER_BRIDGE=${3:-"host"}
 
-docker run -it --rm \
+sudo docker run -it --rm \
   --gpus device=$NV_VISIBLE_DEVICES \
   --net=$DOCKER_BRIDGE \
   --shm-size=1g \

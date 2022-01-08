@@ -843,6 +843,7 @@ class PretrainingModel(tf.keras.Model):
     def call(self, features, past, is_training):
         config = self._config
         # Mask the input
+        # inputs = pretrain_utils.features_to_inputs(features)
         masked_inputs = pretrain_utils.mask(
             config, pretrain_utils.features_to_inputs(features), config.mask_prob)
         # Generator
@@ -886,7 +887,7 @@ class PretrainingModel(tf.keras.Model):
     def _get_masked_lm_output(self, inputs, generator, past, is_training=False):
         """Masked language modeling softmax layer."""
         masked_lm_weights = inputs.masked_lm_weights
-
+        # tf.print(tf.shape(inputs.input_mask))
         if self._config.uniform_generator:
             logits = tf.zeros(self.disc_config.vocab_size)
             logits_tiled = tf.zeros(
@@ -909,6 +910,8 @@ class PretrainingModel(tf.keras.Model):
         oh_labels = tf.one_hot(
             inputs.masked_lm_ids, depth=self.disc_config.vocab_size,
             dtype=tf.float32)
+        # Change the one-hot label from masked tokens to the next token
+        # oh_labels = tf.one_hot(inputs.input_id, depth=self.disc_config.vocab_size, dtype = tf.float32)
         probs = tf.cast(tf.nn.softmax(logits), tf.float32)
         log_probs = tf.cast(tf.nn.log_softmax(logits), tf.float32)
         label_log_probs = -tf.reduce_sum(log_probs * oh_labels, axis=-1)
@@ -926,7 +929,7 @@ class PretrainingModel(tf.keras.Model):
 
     def _get_discriminator_output(self, inputs, discriminator, labels, is_training=False):
         """Discriminator binary classifier."""
-
+        pretrain_utils.reset_attn_mask(inputs)
         outputs = discriminator(
             input_ids=inputs.input_ids,
             attention_mask=inputs.input_mask,

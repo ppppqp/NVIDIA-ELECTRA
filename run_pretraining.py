@@ -426,7 +426,8 @@ def main(e2e_start_time):
         total_loss, eval_fn_inputs = train_one_step(config, model, optimizer, features, accumulator,
                                                     local_step==1, take_step=local_step % args.gradient_accumulation_steps == 0)
         # if step == 300: tf.profiler.experimental.stop()
-
+        if step == 0:
+            model.summary()
         metrics["train_perf"].update_state(
             config.train_batch_size * get_world_size() / (time.time() - iter_start))
         metrics["total_loss"].update_state(values=total_loss)
