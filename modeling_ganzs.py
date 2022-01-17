@@ -24,7 +24,7 @@ from file_utils import add_start_docstrings, add_start_docstrings_to_callable
 from modeling_utils import ACT2FN, TFBertEncoder, TFGPT2PreTrainedModel
 from modeling_utils import get_initializer, shape_list
 from tokenization_utils import BatchEncoding
-import pretrain_utils, collections
+import pretrain_utils_ganzs, collections
 
 logger = logging.getLogger(__name__)
 
@@ -843,9 +843,9 @@ class PretrainingModel(tf.keras.Model):
     def call(self, features, past, is_training):
         config = self._config
         # Mask the input
-        # inputs = pretrain_utils.features_to_inputs(features)
-        masked_inputs = pretrain_utils.mask(
-            config, pretrain_utils.features_to_inputs(features), config.mask_prob)
+        # inputs = pretrain_utils_ganzs.features_to_inputs(features)
+        masked_inputs = pretrain_utils_ganzs.mask(
+            config, pretrain_utils_ganzs.features_to_inputs(features), config.mask_prob)
         # Generator
         if config.uniform_generator:
             mlm_output = self._get_masked_lm_output(masked_inputs, None, is_training=is_training)
@@ -853,6 +853,8 @@ class PretrainingModel(tf.keras.Model):
             mlm_output = self._get_masked_lm_output(
                 masked_inputs, self.generator, past, is_training=is_training)
         fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
+        tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
+        # tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids)
         total_loss = config.gen_weight * mlm_output.loss
 
         # Discriminator
@@ -891,7 +893,7 @@ class PretrainingModel(tf.keras.Model):
         if self._config.uniform_generator:
             logits = tf.zeros(self.disc_config.vocab_size)
             logits_tiled = tf.zeros(
-                pretrain_utils.get_shape_list(inputs.masked_lm_ids) +
+                pretrain_utils_ganzs.get_shape_list(inputs.masked_lm_ids) +
                 [self.disc_config.vocab_size])
             logits_tiled += tf.reshape(logits, [1, 1, self.disc_config.vocab_size])
             logits = logits_tiled
@@ -904,7 +906,7 @@ class PretrainingModel(tf.keras.Model):
                 token_type_ids=inputs.segment_ids,
                 training=is_training)
             logits = outputs[0]
-            logits = pretrain_utils.gather_positions(
+            logits = pretrain_utils_ganzs.gather_positions(
                 logits, inputs.masked_lm_positions)
 
         oh_labels = tf.one_hot(
@@ -929,7 +931,7 @@ class PretrainingModel(tf.keras.Model):
 
     def _get_discriminator_output(self, inputs, discriminator, labels, is_training=False):
         """Discriminator binary classifier."""
-        pretrain_utils.reset_attn_mask(inputs)
+        inputs = pretrain_utils_ganzs.reset_attn_mask(inputs)
         outputs = discriminator(
             input_ids=inputs.input_ids,
             attention_mask=inputs.input_mask,
@@ -937,16 +939,24 @@ class PretrainingModel(tf.keras.Model):
             training=is_training,
         )
         logits = outputs[0]
+        # tf.print("attention_mask here", inputs.input_mask)
         weights = tf.cast(inputs.input_mask, tf.float32)
         labelsf = tf.cast(labels, tf.float32)
         logits = tf.cast(logits, tf.float32)
+        # tf.print("weights:", weights)
+
         losses = tf.nn.sigmoid_cross_entropy_with_logits(
             logits=logits, labels=labelsf) * weights
         per_example_loss = (tf.reduce_sum(losses, axis=-1) /
                             (1e-6 + tf.reduce_sum(weights, axis=-1)))
+        # tf.print("losses:", losses)
         loss = tf.reduce_sum(losses) / (1e-6 + tf.reduce_sum(weights))
+        # tf.print("loss:", loss)
         probs = tf.nn.sigmoid(logits)
         preds = tf.cast(tf.round((tf.sign(logits) + 1) / 2), tf.int32)
+        tf.print("preds:", tf.reduce_sum(preds))
+        tf.print("labels:",tf.reduce_sum(labels))
+        tf.print("differences:", tf.reduce_sum(labels-preds))
         DiscOutput = collections.namedtuple(
             "DiscOutput", ["loss", "per_example_loss", "probs", "preds",
                            "labels"])
@@ -957,18 +967,18 @@ class PretrainingModel(tf.keras.Model):
 
     def _get_fake_data(self, inputs, mlm_logits):
         """Sample from the generator to create corrupted input."""
-        inputs = pretrain_utils.unmask(inputs)
+        inputs = pretrain_utils_ganzs.unmask(inputs)
         disallow = tf.one_hot(
             inputs.masked_lm_ids, depth=self.disc_config.vocab_size,
             dtype=tf.float32) if self._config.disallow_correct else None
-        sampled_tokens = tf.stop_gradient(pretrain_utils.sample_from_softmax(
+        sampled_tokens = tf.stop_gradient(pretrain_utils_ganzs.sample_from_softmax(
             mlm_logits / self._config.temperature, disallow=disallow))
         sampled_tokids = tf.argmax(sampled_tokens, -1, output_type=tf.int32)
-        updated_input_ids, masked = pretrain_utils.scatter_update(
+        updated_input_ids, masked = pretrain_utils_ganzs.scatter_update(
             inputs.input_ids, sampled_tokids, inputs.masked_lm_positions)
         labels = masked * (1 - tf.cast(
             tf.equal(updated_input_ids, inputs.input_ids), tf.int32))
-        updated_inputs = pretrain_utils.get_updated_inputs(
+        updated_inputs = pretrain_utils_ganzs.get_updated_inputs(
             inputs, input_ids=updated_input_ids)
         FakedData = collections.namedtuple("FakedData", [
             "inputs", "is_fake_tokens", "sampled_tokens"])

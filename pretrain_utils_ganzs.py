@@ -262,6 +262,8 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
     # Get the batch size, sequence length, and max masked-out tokens
     N = config.max_predictions_per_seq
 
+    # FIXME:
+    N = 1
 
     B, L = get_shape_list(inputs.input_ids)
     # Find indices where masking out a token is allowed
@@ -272,6 +274,8 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
     # Set the number of tokens to mask out per example
     num_tokens = tf.cast(tf.reduce_sum(inputs.input_mask, -1), tf.float32)
 
+    # FIXME:
+    mask_prob = 1/128
 
 
     num_to_predict = tf.maximum(1, tf.minimum(
@@ -292,7 +296,7 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
     masked_lm_positions = tf.random.categorical(
         sample_logits, N, dtype=tf.int32)
     masked_lm_positions *= tf.cast(masked_lm_weights, tf.int32)
-
+    # tf.print(masked_lm_positions)
     # Get the ids of the masked-out tokens
     shift = tf.expand_dims(L * tf.range(B), -1)
     flat_positions = tf.reshape(masked_lm_positions + shift, [-1, 1])
@@ -303,12 +307,17 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
 
     # Update the input ids
     replace_with_mask_positions = masked_lm_positions * tf.cast(
-        tf.less(tf.random.uniform([B, N]), 0.85), tf.int32)
+        tf.less(tf.random.uniform([B, N]), 1-1/128), tf.int32)
     inputs_ids, _ = scatter_update(
         inputs.input_ids, tf.fill([B, N], vocab["[MASK]"]),
         replace_with_mask_positions)
+    # tf.print(replace_with_mask_positions)
+    attention_mask = tf.cast(tf.sequence_mask(tf.squeeze(masked_lm_positions), maxlen=128), tf.int32)
+    # attention_mask = tf.cast(attention_mask, tf.int32)
+    # tf.print(attention_mask)
     return get_updated_inputs(
         inputs,
+        input_mask = attention_mask,
         input_ids=tf.stop_gradient(inputs_ids),
         masked_lm_positions=masked_lm_positions,
         masked_lm_ids=masked_lm_ids,
