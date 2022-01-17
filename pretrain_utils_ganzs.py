@@ -241,7 +241,7 @@ def _get_candidates_mask(inputs: Inputs, vocab,
     return candidates_mask
 
 
-def mask(config, inputs, mask_prob, proposal_distribution=1.0,
+def mask(config, inputs, mask_prob, pos, proposal_distribution=1.0,
          disallow_from_mask=None, already_masked=None):
     """Implementation of dynamic masking. The optional arguments aren't needed for
     BERT/ELECTRA and are from early experiments in "strategically" masking out
@@ -296,6 +296,7 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
     masked_lm_positions = tf.random.categorical(
         sample_logits, N, dtype=tf.int32)
     masked_lm_positions *= tf.cast(masked_lm_weights, tf.int32)
+    masked_lm_positions = tf.ones([B,1]) * pos
     # tf.print(masked_lm_positions)
     # Get the ids of the masked-out tokens
     shift = tf.expand_dims(L * tf.range(B), -1)
@@ -308,19 +309,21 @@ def mask(config, inputs, mask_prob, proposal_distribution=1.0,
     # Update the input ids
     replace_with_mask_positions = masked_lm_positions * tf.cast(
         tf.less(tf.random.uniform([B, N]), 1-1/128), tf.int32)
-    inputs_ids, _ = scatter_update(
-        inputs.input_ids, tf.fill([B, N], vocab["[MASK]"]),
-        replace_with_mask_positions)
+    # inputs_ids, _ = scatter_update(
+    #     inputs.input_ids, tf.fill([B, N], vocab["[MASK]"]),
+    #     replace_with_mask_positions)
     # tf.print(replace_with_mask_positions)
     attention_mask = tf.cast(tf.sequence_mask(tf.squeeze(masked_lm_positions), maxlen=128), tf.int32)
     # attention_mask = tf.cast(attention_mask, tf.int32)
     # tf.print(attention_mask)
+    tf.print("masked_lm_positions:", tf.shape(masked_lm_positions), masked_lm_positions)
+    tf.print("masked_lm_ids:", tf.shape(masked_lm_ids), masked_lm_ids)
     return get_updated_inputs(
         inputs,
         input_mask = attention_mask,
-        input_ids=tf.stop_gradient(inputs_ids),
-        masked_lm_positions=masked_lm_positions,
-        masked_lm_ids=masked_lm_ids,
+        # input_ids=tf.stop_gradient(inputs_ids), # [44, 1]
+        masked_lm_positions=masked_lm_positions, 
+        masked_lm_ids=masked_lm_ids, # [44 1]
         masked_lm_weights=masked_lm_weights
     )
 

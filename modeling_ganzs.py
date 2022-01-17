@@ -842,20 +842,41 @@ class PretrainingModel(tf.keras.Model):
 
     def call(self, features, past, is_training):
         config = self._config
+        total_loss = 0
+        inputs = pretrain_utils_ganzs.features_to_inputs(features)
+        B, L = pretrain_utils_ganzs.get_shape_list(inputs.input_ids)
+
         # Mask the input
         # inputs = pretrain_utils_ganzs.features_to_inputs(features)
-        masked_inputs = pretrain_utils_ganzs.mask(
-            config, pretrain_utils_ganzs.features_to_inputs(features), config.mask_prob)
+        
         # Generator
-        if config.uniform_generator:
-            mlm_output = self._get_masked_lm_output(masked_inputs, None, is_training=is_training)
-        else:
+
+        # if config.uniform_generator:
+        #     mlm_output = self._get_masked_lm_output(masked_inputs, None, is_training=is_training)
+        # else:
+
+        # No need for uniform_generator
+        mlm_output_total = None
+        for pos in range(L):
+            # mask the position
+            masked_inputs = pretrain_utils_ganzs.mask(
+                config, inputs, config.mask_prob, pos)
             mlm_output = self._get_masked_lm_output(
                 masked_inputs, self.generator, past, is_training=is_training)
+            if not mlm_output_total:
+                mlm_output_total = mlm_output
+            else:
+                mlm_output_total.logits = tf.concat(mlm_output_total.logits, mlm_output.logits)
+            # concat the masked inputs position
+            total_loss += config.gen_weight * mlm_output_total.loss
+
+        masked_inputs = pretrain_utils_ganzs.get_updated_inputs(
+            masked_inputs,
+            masked_lm_positions = tf.ones([B, L]),
+        )
         fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
-        tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
+        # tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
         # tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids)
-        total_loss = config.gen_weight * mlm_output.loss
 
         # Discriminator
         disc_output = None
@@ -905,7 +926,7 @@ class PretrainingModel(tf.keras.Model):
                 attention_mask=inputs.input_mask,
                 token_type_ids=inputs.segment_ids,
                 training=is_training)
-            logits = outputs[0]
+            logits = outputs[0]# [44,1,35]
             logits = pretrain_utils_ganzs.gather_positions(
                 logits, inputs.masked_lm_positions)
 
