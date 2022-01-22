@@ -296,8 +296,7 @@ def mask(config, inputs, mask_prob, pos, proposal_distribution=1.0,
     masked_lm_positions = tf.random.categorical(
         sample_logits, N, dtype=tf.int32)
     masked_lm_positions *= tf.cast(masked_lm_weights, tf.int32)
-    masked_lm_positions = tf.ones([B,1]) * pos
-    # tf.print(masked_lm_positions)
+    masked_lm_positions = tf.ones([B,1], dtype=tf.int32) * pos
     # Get the ids of the masked-out tokens
     shift = tf.expand_dims(L * tf.range(B), -1)
     flat_positions = tf.reshape(masked_lm_positions + shift, [-1, 1])

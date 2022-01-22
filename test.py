@@ -9,7 +9,7 @@ import tensorflow as tf
 import horovod.tensorflow as hvd
 from horovod.tensorflow.compression import Compression
 from gpu_affinity import set_affinity
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 import utils
 import sys
 import numpy as np

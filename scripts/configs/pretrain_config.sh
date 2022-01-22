@@ -35,7 +35,7 @@ rtx3090_1gpu_amp (){
     warmup_steps_p2="1"
     train_steps_p2=1
     gradient_accumulation_steps_p2=144
-    electra_model="base"
+    electra_model="test"
     echo $train_batch_size_p1 $learning_rate_p1 $precision $num_gpus $xla \
          $warmup_steps_p1 $train_steps_p1 $save_checkpoint_steps \
          $resume_training $optimizer $accumulate_gradients  \

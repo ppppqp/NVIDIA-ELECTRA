@@ -856,25 +856,65 @@ class PretrainingModel(tf.keras.Model):
         # else:
 
         # No need for uniform_generator
-        mlm_output_total = None
-        for pos in range(L):
+
+        logits_record = None
+        # collect all logits in a batch
+
+        for pos in range(2):
             # mask the position
+            tf.print("position:", pos)
             masked_inputs = pretrain_utils_ganzs.mask(
                 config, inputs, config.mask_prob, pos)
+            # gpus = tf.config.experimental.list_physical_devices('GPU')
+            # tf.config.experimental.get_memory_info()['current']
             mlm_output = self._get_masked_lm_output(
                 masked_inputs, self.generator, past, is_training=is_training)
-            if not mlm_output_total:
-                mlm_output_total = mlm_output
+            if logits_record == None:
+                logits_record = mlm_output.logits
             else:
-                mlm_output_total.logits = tf.concat(mlm_output_total.logits, mlm_output.logits)
+                logits_record = tf.concat([logits_record, mlm_output.logits], 1)
             # concat the masked inputs position
-            total_loss += config.gen_weight * mlm_output_total.loss
+            total_loss += config.gen_weight * mlm_output.loss
+        
+
+        ## START SAMPLING ===========================================
+        N = config.max_predictions_per_seq
+        vocab = tokenization.ElectraTokenizer(
+        config.vocab_file, do_lower_case=config.do_lower_case).get_vocab()
+        candidates_mask = _get_candidates_mask(inputs, vocab, disallow_from_mask)
+
+        # Set the number of tokens to mask out per example
+        num_tokens = tf.cast(tf.reduce_sum(inputs.input_mask, -1), tf.float32)
+
+        # FIXME:
+        mask_prob = 0.15
+
+
+        num_to_predict = tf.maximum(1, tf.minimum(
+            N, tf.cast(tf.round(num_tokens * mask_prob), tf.int32)))
+
+        # Get a probability of masking each position in the sequence
+        candidate_mask_float = tf.cast(candidates_mask, tf.float32)
+        sample_prob = (proposal_distribution * candidate_mask_float)
+        sample_prob /= tf.reduce_sum(sample_prob, axis=-1, keepdims=True)
+
+        # Sample the positions to mask out
+        sample_prob = tf.stop_gradient(sample_prob)
+        sample_logits = tf.math.log(sample_prob)
+        masked_lm_positions = tf.random.categorical(
+            sample_logits, N, dtype=tf.int32)
+        # [44,19]
+        # [44,128,25600]->[44,19,25600]
+        ## END SAMPLING ===========================================
+
+        logits_sampled = tf.gather_nd(sample_logits, masked_lm_positions)
+        tf.print("logits_sampled", tf.shape(logits_sampled), logits_sampled)
 
         masked_inputs = pretrain_utils_ganzs.get_updated_inputs(
             masked_inputs,
-            masked_lm_positions = tf.ones([B, L]),
+            masked_lm_positions = masked_lm_positions,
         )
-        fake_data = self._get_fake_data(masked_inputs, mlm_output.logits)
+        fake_data = self._get_fake_data(masked_inputs, logits_record)
         # tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
         # tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids)
 
