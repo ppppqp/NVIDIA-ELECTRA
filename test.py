@@ -9,6 +9,7 @@ import tensorflow as tf
 import horovod.tensorflow as hvd
 from horovod.tensorflow.compression import Compression
 from gpu_affinity import set_affinity
+import tokenization
 # from matplotlib import pyplot as plt
 import utils
 import sys
@@ -16,9 +17,11 @@ import numpy as np
 import pretrain_utils
 from utils import get_rank, get_world_size, is_main_process, log, log_config, setup_logger, postprocess_dllog
 from tokenization import ElectraTokenizer
-from modeling_ganzs import PretrainingModel
+from modeling_ganzs import PretrainingModel, TFElectraForPreTraining, get_generator_config, TFElectraForMaskedLM
 from optimization import create_optimizer, GradientAccumulator
 import dllogger
+import pretrain_utils_ganzs
+from configuration_ganzs import ElectraConfig
 class PretrainingConfig(object):
     """Defines pre-training hyperparameters."""
 
@@ -170,6 +173,7 @@ class PretrainingConfig(object):
 def metric_fn(config, metrics, eval_fn_inputs):
     """Computes the loss and accuracy of the model."""
     d = eval_fn_inputs
+
     metrics["masked_lm_accuracy"].update_state(
         y_true=tf.reshape(d["masked_lm_ids"], [-1]),
         y_pred=tf.reshape(d["masked_lm_preds"], [-1]),
@@ -198,15 +202,38 @@ def metric_fn(config, metrics, eval_fn_inputs):
                 sample_weight=d["disc_labels"] * d["input_mask"])
     return metrics
 
-def train_one_step(config, model, optimizer, features, past, accumulator, first_step, take_step, clip_norm=1.0):
+def train_one_step(config, model, optimizer, masked_inputs, past, accumulator, first_step, take_step, labels = None, clip_norm=1.0, disc_config=None, gen=True):
 
     #Forward and Backward pass
     with tf.GradientTape() as tape:
-        total_loss, eval_fn_inputs = model(features, None, is_training=True)
-        unscaled_loss = tf.stop_gradient(total_loss)
-        if config.amp:
-            total_loss = optimizer.get_scaled_loss(total_loss)
-   
+        if gen:
+            mlm_output = pretrain_utils_ganzs.get_masked_lm_output(masked_inputs, model,  past, disc_config, is_training=True)
+            eval_fn_inputs = {
+                "input_ids": masked_inputs.input_ids,
+                "masked_lm_preds": mlm_output.preds,
+                "mlm_loss": mlm_output.per_example_loss,
+                "masked_lm_ids": masked_inputs.masked_lm_ids,
+                "masked_lm_weights": masked_inputs.masked_lm_weights,
+                "input_mask": masked_inputs.input_mask
+            }
+        # total_loss, eval_fn_inputs = model(features, None, is_training=True)
+            unscaled_loss = tf.stop_gradient(mlm_output.loss)
+            output = mlm_output
+            if config.amp:
+                total_loss = optimizer.get_scaled_loss(mlm_output.loss)
+        else:
+            disc_output = pretrain_utils_ganzs.get_discriminator_output(masked_inputs, model, labels, is_training=True)
+            eval_fn_inputs = {
+                "disc_loss": disc_output.per_example_loss,
+                "disc_labels": disc_output.labels,
+                "disc_probs": disc_output.probs,
+                "disc_preds": disc_output.preds,
+            }
+            unscaled_loss = tf.stop_gradient(disc_output.loss)
+            output = disc_output
+            if config.amp:
+                total_loss = optimizer.get_scaled_loss(disc_output.loss)
+    
     #Backpropogate gradients
     #tape = hvd.DistributedGradientTape(
     #    tape, sparse_as_dense=True,
@@ -236,7 +263,7 @@ def train_one_step(config, model, optimizer, features, past, accumulator, first_
         hvd.broadcast_variables(model.variables, root_rank=0)
         hvd.broadcast_variables(optimizer.variables(), root_rank=0)
 
-    return unscaled_loss, eval_fn_inputs
+    return output, unscaled_loss, eval_fn_inputs
 
 def main(e2e_start_time):
     parser = argparse.ArgumentParser()
@@ -311,6 +338,39 @@ def main(e2e_start_time):
         utils.write_json(config.__dict__, pretrain_config_json)
         log("Configuration saved in {}".format(pretrain_config_json))
     model = PretrainingModel(config)
+    ### Start Setting up models
+    disc_config = ElectraConfig(
+            vocab_size=config.vocab_size,
+            n_positions=config.n_positions,
+            # n_ctx=config.n_ctx,
+            n_embd=config.n_embd,
+            n_layer=config.n_layer,
+            n_head=config.n_head,
+            n_inner=config.n_inner,
+            activation_function=config.activation_function,
+            resid_pdrop=config.resid_pdrop,
+            embd_pdrop=config.embd_pdrop,
+            attn_pdrop=config.attn_pdrop,
+            layer_norm_epsilon=config.layer_norm_epsilon,
+            initializer_range=config.initializer_range,
+            scale_attn_weights=config.scale_attn_weights,
+            use_cache=config.use_cache
+        )
+    disc_config.update({"amp": config.amp})
+    discriminator = TFElectraForPreTraining(disc_config)
+    gen_config = get_generator_config(config, disc_config)
+    gen_config.update({"amp": config.amp})
+    if config.electra_objective:
+        if config.shared_embeddings:
+            generator = TFElectraForMaskedLM(
+                gen_config, shared_embeddings=True,
+                input_embeddings=discriminator.get_input_embeddings())
+        else:
+            generator = TFElectraForMaskedLM(gen_config)
+    else:
+        generator = TFElectraForMaskedLM(disc_config)
+
+    ### End Setting up models
     print("model initialized")
     metrics = dict()
     metrics["train_perf"] = tf.keras.metrics.Mean(name="train_perf")
@@ -347,7 +407,8 @@ def main(e2e_start_time):
         beta_2=config.opt_beta_2,
         end_lr=config.end_lr)
         
-    accumulator = GradientAccumulator()
+    gen_accumulator = GradientAccumulator()
+    disc_accumulator = GradientAccumulator()
     if config.amp:
         optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, "dynamic")
     # Set up model checkpoint
@@ -397,7 +458,8 @@ def main(e2e_start_time):
             log(" ** Restored iterator checkpoint from {}".format(iter_manager.latest_checkpoint), all_rank=True)
 
     utils.heading("Running training")
-    accumulator.reset()
+    gen_accumulator.reset()
+    disc_accumulator.reset()
     train_start, start_step = time.time(), int(checkpoint.step) - 1
     local_step = 0
     saved_ckpt = False
@@ -413,12 +475,147 @@ def main(e2e_start_time):
         saved_ckpt = False
         step = int(checkpoint.step)
         features = next(train_iterator)
+        inputs = pretrain_utils_ganzs.features_to_inputs(features)
         iter_start = time.time()
         past = None
+        total_loss = 0
         # if step == 200: tf.profiler.experimental.start(logdir=train_log_dir)
-        # print("before training one step")
-        total_loss, eval_fn_inputs = train_one_step(config, model, optimizer, features, past, accumulator,
-                                                    local_step==1, take_step=local_step % args.gradient_accumulation_steps == 0)
+        ## START EXPLICIT TRAINING generator & discriminator
+        B, L = pretrain_utils_ganzs.get_shape_list(inputs.input_ids)
+        logits_record = None
+        # collect all logits in a batch
+
+        for pos in range(L):
+            # mask the position
+            masked_inputs = pretrain_utils_ganzs.mask(
+                config, inputs, config.mask_prob, pos)
+            # gpus = tf.config.experimental.list_physical_devices('GPU')
+            # tf.config.experimental.get_memory_info()['current']
+            mlm_output, gen_loss, eval_fn_inputs = train_one_step(config, generator, optimizer, masked_inputs, past, gen_accumulator, 
+                                                    local_step==1, disc_config=disc_config, take_step=local_step % args.gradient_accumulation_steps == 0, gen=True)
+            if logits_record == None:
+                logits_record = mlm_output.logits
+            else:
+                logits_record = tf.concat([logits_record, mlm_output.logits], 1)
+            # concat the masked inputs position
+            
+            total_loss += config.gen_weight * gen_loss
+
+            ## START SAMPLING ===========================================
+        N = config.max_predictions_per_seq
+        vocab = tokenization.ElectraTokenizer(
+        config.vocab_file, do_lower_case=config.do_lower_case).get_vocab()
+        candidates_mask = pretrain_utils_ganzs._get_candidates_mask(inputs, vocab)
+
+        # Set the number of tokens to mask out per example
+        num_tokens = tf.cast(tf.reduce_sum(inputs.input_mask, -1), tf.float32)
+
+        # FIXME:
+        mask_prob = 0.15
+
+
+        num_to_predict = tf.maximum(1, tf.minimum(
+            N, tf.cast(tf.round(num_tokens * mask_prob), tf.int32)))
+
+        # Get a probability of masking each position in the sequence
+        candidate_mask_float = tf.cast(candidates_mask, tf.float32)
+        sample_prob = (1.0 * candidate_mask_float)
+        sample_prob /= tf.reduce_sum(sample_prob, axis=-1, keepdims=True)
+    # tf.stack((tf.argsort(in1, axis=0, stable=True), in1), axis=-1)
+        masked_lm_weights = tf.cast(tf.sequence_mask(num_to_predict, N), tf.float32)
+
+        # Sample the positions to mask out
+        sample_prob = tf.stop_gradient(sample_prob)
+        sample_logits = tf.math.log(sample_prob)
+        masked_lm_positions = tf.random.categorical(
+            sample_logits, N, dtype=tf.int32)
+        masked_lm_positions *= tf.cast(masked_lm_weights, tf.int32)
+        shift = tf.expand_dims(L * tf.range(B), -1)
+        flat_positions = tf.reshape(masked_lm_positions + shift, [-1, 1])
+        masked_lm_ids = tf.gather_nd(tf.reshape(inputs.input_ids, [-1]),
+                                    flat_positions)
+        masked_lm_ids = tf.reshape(masked_lm_ids, [B, -1])
+        masked_lm_ids *= tf.cast(masked_lm_weights, tf.int32)
+        # [44,19]
+        # [44,128,25600]->[44,19,25600]
+        ## END SAMPLING ===========================================
+        # tf.print("logits sampled", tf.shape(masked_lm_positions), masked_lm_positions)
+
+        # idx = tf.argsort(tf.zeros((B, 19)), axis=0, stable=True)
+        # stacked = tf.stack((idx, masked_lm_positions), axis = -1)
+        # tf.print("stacked", tf.shape(stacked), stacked)
+
+        logits_sampled = tf.gather(logits_record, masked_lm_positions, axis=1, batch_dims=1)
+
+        
+        masked_inputs = pretrain_utils_ganzs.get_updated_inputs(
+            masked_inputs,
+            masked_lm_positions = masked_lm_positions,
+            masked_lm_ids = masked_lm_ids,
+            masked_lm_weights=masked_lm_weights
+        )
+        ### We need to recalculate the mlm_loss and masked_lm_preds
+        oh_labels = tf.one_hot(
+            masked_inputs.masked_lm_ids, depth=disc_config.vocab_size,
+            dtype=tf.float32)
+        probs = tf.cast(tf.nn.softmax(logits_sampled), tf.float32)
+        log_probs = tf.cast(tf.nn.log_softmax(logits_sampled), tf.float32)
+        label_log_probs = -tf.reduce_sum(log_probs * oh_labels, axis=-1)
+
+        numerator = tf.reduce_sum(masked_lm_weights * label_log_probs)
+        denominator = tf.reduce_sum(masked_lm_weights) + 1e-6
+        loss = numerator / denominator
+        preds = tf.argmax(log_probs, axis=-1, output_type=tf.int32)
+        MLMOutput = collections.namedtuple(
+            "MLMOutput", ["logits", "probs", "loss", "per_example_loss", "preds"])
+        mlm_output = MLMOutput(
+            logits=logits_sampled, probs=probs, per_example_loss=label_log_probs,
+            loss=loss, preds=preds)
+
+
+
+
+        fake_data = pretrain_utils_ganzs.get_fake_data(masked_inputs, logits_sampled, disc_config, config)
+        # tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
+        # tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids)
+
+        # Discriminator
+        disc_output = None
+        if config.electra_objective:
+            disc_output, disc_loss, eval_fn_inputs = train_one_step(config, discriminator, optimizer, inputs, past, disc_accumulator, 
+                                        local_step==1, disc_config=disc_config, labels=fake_data.is_fake_tokens, take_step=local_step % args.gradient_accumulation_steps == 0, gen=False)
+            total_loss += config.disc_weight * disc_output.loss
+
+        # Evaluation inputs
+
+
+
+
+
+        eval_fn_inputs = {
+            "input_ids": masked_inputs.input_ids,
+            "masked_lm_preds": mlm_output.preds,
+            "mlm_loss": mlm_output.per_example_loss,
+            "masked_lm_ids": masked_inputs.masked_lm_ids,
+            "masked_lm_weights": masked_inputs.masked_lm_weights,
+            "input_mask": masked_inputs.input_mask
+        }
+        # tf.print("eval_fn_inputs", tf.shape(eval_fn_inputs["masked_lm_weights"]))
+        if config.electra_objective:
+            eval_fn_inputs.update({
+                "disc_loss": disc_output.per_example_loss,
+                "disc_labels": disc_output.labels,
+                "disc_probs": disc_output.probs,
+                "disc_preds": disc_output.preds,
+                "sampled_tokids": tf.argmax(fake_data.sampled_tokens, -1,
+                                            output_type=tf.int32)
+            })
+
+
+
+
+
+        ## END EXPLICIT TRAINING 
         # if step == 300: tf.profiler.experimental.stop()
         metrics["train_perf"].update_state(
             config.train_batch_size * get_world_size() / (time.time() - iter_start))
@@ -482,16 +679,6 @@ def main(e2e_start_time):
             log(" ** Saved model checkpoint for step {}: {}".format(step, save_path))
         iter_save_path = iter_manager.save(checkpoint_number=step)
         log(" ** Saved iterator checkpoint for step {}: {}".format(step, iter_save_path), all_rank=True)
-    t = np.array(range(len(total_loss_record)))
-    print(total_loss_record)
-    plt.plot(t,total_loss_record, label='total loss')
-    plt.plot(t,mlm_loss_record, label='mlm loss')
-    plt.plot(t, disc_loss_record, label = 'disc loss')
-    plt.title('Loss Plot')
-    plt.legend()
-    plt.xlabel('Iteration')
-    plt.ylabel('Loss')
-    plt.savefig("loss_plot.png")
     # plt.plot(t,mlm_acc_record)
     # plt.plot(t,disc_acc_record)
     # plt.savefig("acc_plot.png")

@@ -315,8 +315,6 @@ def mask(config, inputs, mask_prob, pos, proposal_distribution=1.0,
     attention_mask = tf.cast(tf.sequence_mask(tf.squeeze(masked_lm_positions), maxlen=128), tf.int32)
     # attention_mask = tf.cast(attention_mask, tf.int32)
     # tf.print(attention_mask)
-    tf.print("masked_lm_positions:", tf.shape(masked_lm_positions), masked_lm_positions)
-    tf.print("masked_lm_ids:", tf.shape(masked_lm_ids), masked_lm_ids)
     return get_updated_inputs(
         inputs,
         input_mask = attention_mask,
@@ -387,3 +385,92 @@ def print_tokens(inputs: Inputs, inv_vocab, updates_mask=None):
                 assert um == 0
         text += token + " "
     utils.log(utils.printable_text(text))
+
+def get_masked_lm_output(inputs, generator, past, disc_config, is_training=False):
+    """Masked language modeling softmax layer."""
+    masked_lm_weights = inputs.masked_lm_weights
+    # tf.print(tf.shape(inputs.input_mask))
+        #FIXME:
+    outputs = generator(
+        input_ids=inputs.input_ids,
+        past_key_values = None,
+        attention_mask=inputs.input_mask,
+        token_type_ids=inputs.segment_ids,
+        training=is_training)
+    logits = outputs[0]# [44,1,35]
+    logits = gather_positions(
+        logits, inputs.masked_lm_positions)
+
+    oh_labels = tf.one_hot(
+        inputs.masked_lm_ids, depth=disc_config.vocab_size,
+        dtype=tf.float32)
+    # Change the one-hot label from masked tokens to the next token
+    # oh_labels = tf.one_hot(inputs.input_id, depth=self.disc_config.vocab_size, dtype = tf.float32)
+    probs = tf.cast(tf.nn.softmax(logits), tf.float32)
+    log_probs = tf.cast(tf.nn.log_softmax(logits), tf.float32)
+    label_log_probs = -tf.reduce_sum(log_probs * oh_labels, axis=-1)
+
+    numerator = tf.reduce_sum(masked_lm_weights * label_log_probs)
+    denominator = tf.reduce_sum(masked_lm_weights) + 1e-6
+    loss = numerator / denominator
+    preds = tf.argmax(log_probs, axis=-1, output_type=tf.int32)
+
+    MLMOutput = collections.namedtuple(
+        "MLMOutput", ["logits", "probs", "loss", "per_example_loss", "preds"])
+    return MLMOutput(
+        logits=logits, probs=probs, per_example_loss=label_log_probs,
+        loss=loss, preds=preds)
+
+def get_discriminator_output(inputs, discriminator, labels, is_training=False):
+    """Discriminator binary classifier."""
+    inputs = reset_attn_mask(inputs)
+    outputs = discriminator(
+        input_ids=inputs.input_ids,
+        attention_mask=inputs.input_mask,
+        token_type_ids=inputs.segment_ids,
+        training=is_training,
+    )
+    logits = outputs[0]
+    # tf.print("attention_mask here", inputs.input_mask)
+    weights = tf.cast(inputs.input_mask, tf.float32)
+    labelsf = tf.cast(labels, tf.float32)
+    logits = tf.cast(logits, tf.float32)
+    # tf.print("weights:", weights)
+
+    losses = tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=logits, labels=labelsf) * weights
+    per_example_loss = (tf.reduce_sum(losses, axis=-1) /
+                        (1e-6 + tf.reduce_sum(weights, axis=-1)))
+    # tf.print("losses:", losses)
+    loss = tf.reduce_sum(losses) / (1e-6 + tf.reduce_sum(weights))
+    # tf.print("loss:", loss)
+    probs = tf.nn.sigmoid(logits)
+    preds = tf.cast(tf.round((tf.sign(logits) + 1) / 2), tf.int32)
+    tf.print("preds:", tf.reduce_sum(preds))
+    tf.print("labels:",tf.reduce_sum(labels))
+    tf.print("differences:", tf.reduce_sum(labels-preds))
+    DiscOutput = collections.namedtuple(
+        "DiscOutput", ["loss", "per_example_loss", "probs", "preds",
+                        "labels"])
+    return DiscOutput(
+        loss=loss, per_example_loss=per_example_loss, probs=probs,
+        preds=preds, labels=labels,
+    )
+
+def get_fake_data(inputs, mlm_logits, disc_config, config):
+    """Sample from the generator to create corrupted input."""
+    inputs = unmask(inputs)
+    disallow = None
+    sampled_tokens = tf.stop_gradient(sample_from_softmax(
+        mlm_logits / config.temperature, disallow=disallow))
+    sampled_tokids = tf.argmax(sampled_tokens, -1, output_type=tf.int32)
+    updated_input_ids, masked = scatter_update(
+        inputs.input_ids, sampled_tokids, inputs.masked_lm_positions)
+    labels = masked * (1 - tf.cast(
+        tf.equal(updated_input_ids, inputs.input_ids), tf.int32))
+    updated_inputs = get_updated_inputs(
+        inputs, input_ids=updated_input_ids)
+    FakedData = collections.namedtuple("FakedData", [
+        "inputs", "is_fake_tokens", "sampled_tokens"])
+    return FakedData(inputs=updated_inputs, is_fake_tokens=labels,
+                        sampled_tokens=sampled_tokens)
