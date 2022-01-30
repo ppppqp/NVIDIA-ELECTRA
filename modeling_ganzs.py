@@ -247,12 +247,13 @@ class TFElectraMainLayer(TFElectraPreTrainedModel):
         self.ln_f = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_epsilon, name="ln_f")
 
     def build(self, input_shape):
-        with tf.name_scope("wpe"):
-            self.wpe = self.add_weight(
-                name="embeddings",
-                shape=[self.n_positions, self.n_embd],
-                initializer=get_initializer(self.initializer_range),
-            )
+        pass
+        # with tf.name_scope("wpe"):
+        #     self.wpe = self.add_weight(
+        #         name="embeddings",
+        #         shape=[self.n_positions, self.n_embd],
+        #         initializer=get_initializer(self.initializer_range),
+        #     )
         # super().build(input_shape)
 
     def get_input_embeddings(self):
@@ -966,7 +967,7 @@ class PretrainingModel(tf.keras.Model):
                 attention_mask=inputs.input_mask,
                 token_type_ids=inputs.segment_ids,
                 training=is_training)
-            logits = outputs[0]# [44,1,35]
+            logits = outputs[0]# [44,1,vocab_size]
             logits = pretrain_utils_ganzs.gather_positions(
                 logits, inputs.masked_lm_positions)
 
@@ -1004,7 +1005,6 @@ class PretrainingModel(tf.keras.Model):
         weights = tf.cast(inputs.input_mask, tf.float32)
         labelsf = tf.cast(labels, tf.float32)
         logits = tf.cast(logits, tf.float32)
-        # tf.print("weights:", weights)
 
         losses = tf.nn.sigmoid_cross_entropy_with_logits(
             logits=logits, labels=labelsf) * weights
@@ -1012,12 +1012,8 @@ class PretrainingModel(tf.keras.Model):
                             (1e-6 + tf.reduce_sum(weights, axis=-1)))
         # tf.print("losses:", losses)
         loss = tf.reduce_sum(losses) / (1e-6 + tf.reduce_sum(weights))
-        # tf.print("loss:", loss)
         probs = tf.nn.sigmoid(logits)
         preds = tf.cast(tf.round((tf.sign(logits) + 1) / 2), tf.int32)
-        tf.print("preds:", tf.reduce_sum(preds))
-        tf.print("labels:",tf.reduce_sum(labels))
-        tf.print("differences:", tf.reduce_sum(labels-preds))
         DiscOutput = collections.namedtuple(
             "DiscOutput", ["loss", "per_example_loss", "probs", "preds",
                            "labels"])

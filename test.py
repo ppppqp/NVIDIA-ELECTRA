@@ -474,6 +474,7 @@ def main(e2e_start_time):
     while int(checkpoint.step) <= config.num_train_steps:
         saved_ckpt = False
         step = int(checkpoint.step)
+        tf.print("step:",step)
         features = next(train_iterator)
         inputs = pretrain_utils_ganzs.features_to_inputs(features)
         iter_start = time.time()
@@ -576,7 +577,6 @@ def main(e2e_start_time):
 
 
         fake_data = pretrain_utils_ganzs.get_fake_data(masked_inputs, logits_sampled, disc_config, config)
-        # tf.print("FAKING:", tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids))
         # tf.math.count_nonzero(fake_data.inputs.input_ids - masked_inputs.input_ids)
 
         # Discriminator
@@ -659,9 +659,9 @@ def main(e2e_start_time):
                 step=step, **log_info_dict),
                 all_rank=False)
 
-        if local_step % args.gradient_accumulation_steps == 0:
-            checkpoint.step.assign(int(optimizer.iterations))
-        
+        # if local_step % args.gradient_accumulation_steps == 0:
+        #     checkpoint.step.assign(int(optimizer.iterations))
+        checkpoint.step.assign(checkpoint.step+1)
         local_step += 1
         if not config.skip_checkpoint and (local_step % (config.save_checkpoints_steps * args.gradient_accumulation_steps) == 0):
             saved_ckpt = True
