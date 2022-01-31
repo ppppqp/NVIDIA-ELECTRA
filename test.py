@@ -9,7 +9,6 @@ import tensorflow as tf
 import horovod.tensorflow as hvd
 from horovod.tensorflow.compression import Compression
 from gpu_affinity import set_affinity
-from matplotlib import pyplot as plt
 import utils
 import sys
 import numpy as np
@@ -484,17 +483,6 @@ def main(e2e_start_time):
         log(" ** Saved iterator checkpoint for step {}: {}".format(step, iter_save_path), all_rank=True)
     t = np.array(range(len(total_loss_record)))
     print(total_loss_record)
-    plt.plot(t,total_loss_record, label='total loss')
-    plt.plot(t,mlm_loss_record, label='mlm loss')
-    plt.plot(t, disc_loss_record, label = 'disc loss')
-    plt.title('Loss Plot')
-    plt.legend()
-    plt.xlabel('Iteration')
-    plt.ylabel('Loss')
-    plt.savefig("loss_plot.png")
-    # plt.plot(t,mlm_acc_record)
-    # plt.plot(t,disc_acc_record)
-    # plt.savefig("acc_plot.png")
     return args
 if __name__ == "__main__":
     start_time = time.time()
