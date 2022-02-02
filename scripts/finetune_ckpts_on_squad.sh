@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-checkpoints=${checkpoints:-"results/models/base/checkpoints"}
+# checkpoints=${checkpoints:-"results/models/base/checkpoints"}
+checkpoints=${checkpoints:-"test_results/models/base/checkpoints"}
+
 for folder in $checkpoints; do
 
     ckpts_dir=${folder}

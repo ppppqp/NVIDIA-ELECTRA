@@ -435,7 +435,7 @@ def get_discriminator_output(inputs, discriminator, labels, is_training=False):
     weights = tf.cast(inputs.input_mask, tf.float32)
     labelsf = tf.cast(labels, tf.float32)
     logits = tf.cast(logits, tf.float32)
-    tf.print("logits:", logits, tf.shape(logits), summarize=5)
+    # tf.print("logits:", logits, tf.shape(logits), summarize=5)
 
     losses = tf.nn.sigmoid_cross_entropy_with_logits(
         logits=logits, labels=labelsf) * weights
@@ -443,15 +443,15 @@ def get_discriminator_output(inputs, discriminator, labels, is_training=False):
                         (1e-6 + tf.reduce_sum(weights, axis=-1)))
     # tf.print("losses:", losses)
     loss = tf.reduce_sum(losses) / (1e-6 + tf.reduce_sum(weights))
-    tf.print("losses:", losses, tf.shape(losses), summarize=5)
+    # tf.print("losses:", losses, tf.shape(losses), summarize=5)
     # tf.print("loss:", loss)
     probs = tf.nn.sigmoid(logits)
     # tf.print("probs:", probs, summarize=-1)
     preds = tf.cast(tf.round((tf.sign(logits) + 1) / 2), tf.int32)
-    tf.print("loss:", loss)
-    tf.print("preds:", preds, tf.shape(preds), summarize=5)
-    tf.print("labels:",labels, tf.shape(labels), summarize=5)
-    tf.print("differences:", tf.reduce_sum(labels-preds))
+    # tf.print("loss:", loss)
+    # tf.print("preds:", preds, tf.shape(preds), summarize=5)
+    # tf.print("labels:",labels, tf.shape(labels), summarize=5)
+    # tf.print("differences:", tf.reduce_sum(labels-preds))
     DiscOutput = collections.namedtuple(
         "DiscOutput", ["loss", "per_example_loss", "probs", "preds",
                         "labels"])

@@ -14,7 +14,8 @@
 # limitations under the License.
 rtx3090_1gpu_amp_local ()
 {
-    electra_model="results/models/base/checkpoints/discriminator"
+    # electra_model="results/models/base/checkpoints/discriminator"
+    electra_model="test_results/models/base/checkpoints/discriminator"
     epochs="2"
     batch_size="32"
     infer_batch_size="512"
