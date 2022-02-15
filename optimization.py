@@ -182,7 +182,6 @@ class AdamWeightDecay(tf.keras.optimizers.Adam):
             apply_state[(var_device, var_dtype)] = coefficients
         lr_t = coefficients["lr_t"]
         lr = coefficients["lr"]
-
         if self.layer_decay is not None:
             update_for_var = False
             for key in self.layer_decay:
@@ -191,8 +190,8 @@ class AdamWeightDecay(tf.keras.optimizers.Adam):
                     lr_t *= self.layer_decay[key]
                     lr *= self.layer_decay[key]
                     break
-            if not update_for_var:
-                raise ValueError("No learning rate specified for variable", var)
+            # if not update_for_var:
+                # raise ValueError("No learning rate specified for variable", var)
 
         return lr_t, lr, coefficients, dict(apply_state=apply_state)
 

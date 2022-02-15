@@ -406,8 +406,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin):
             # Load from a PyTorch checkpoint
             raise NotImplementedError
             # return load_pytorch_checkpoint_in_tf2_model(model, resolved_archive_file, allow_missing_keys=True)
-
-        model(model.dummy_inputs, training=False)  # build the network with dummy inputs
+        model(input_ids = model.dummy_inputs["input_ids"], training=False)  # build the network with dummy inputs
 
         assert os.path.isfile(resolved_archive_file), "Error retrieving file {}".format(resolved_archive_file)
         # 'by_name' allow us to do transfer learning by skipping/adding layers
@@ -420,7 +419,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin):
                 "If you tried to load a TF 2.0 model from a PyTorch checkpoint, please set from_pt=True. "
             )
 
-        model(model.dummy_inputs, training=False)  # Make sure restore ops are run
+        model(input_ids = model.dummy_inputs["input_ids"], training=False)  # Make sure restore ops are run
 
         # Check if the models are the same to output loading information
         with h5py.File(resolved_archive_file, "r") as f:

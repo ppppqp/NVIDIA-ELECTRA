@@ -143,10 +143,10 @@ class PretrainingConfig(object):
         elif self.model_size == "test":
             self.embedding_size = 768
             self.hidden_size = 768
-            self.num_hidden_layers = 8
+            self.num_hidden_layers = 4
             if self.hidden_size % 64 != 0:
                 raise ValueError("Hidden size {} should be divisible by 64. Number of attention heads is hidden size {} / 64 ".format(self.hidden_size, self.hidden_size))	
-            self.num_attention_heads = 8
+            self.num_attention_heads = 4
         elif self.model_size == "large":
             self.embedding_size = 1024
             self.hidden_size = 1024

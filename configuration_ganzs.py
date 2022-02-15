@@ -1,7 +1,7 @@
 from configuration_utils import PretrainedConfig
 import tensorflow as tf
 class ElectraConfig(PretrainedConfig):
-    model_type = "ganzs"
+    model_type = "electra"
     keys_to_ignore_at_inference = ["past_key_values"]
     attribute_map = {
         "hidden_size": "n_embd",
@@ -17,8 +17,8 @@ class ElectraConfig(PretrainedConfig):
         n_positions=1024,
         n_ctx=1024,
         n_embd=768,
-        n_layer=12,
-        n_head=12,
+        n_layer=4,
+        n_head=4,
         n_inner=None,
         activation_function="gelu_new",
         resid_pdrop=0.1,
@@ -68,7 +68,7 @@ class ElectraConfig(PretrainedConfig):
         self.hidden_act=self.activation_function
         # some extra
         self.add_cross_attention = False
-
+        self.amp = True
         super().__init__(bos_token_id=bos_token_id, eos_token_id=eos_token_id, **kwargs)
 
 

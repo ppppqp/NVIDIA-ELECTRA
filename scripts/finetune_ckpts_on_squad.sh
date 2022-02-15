@@ -23,7 +23,7 @@ for folder in $checkpoints; do
     for f in $ckpts_dir/*.index; do
         ckpt=${f%.*}
         echo "==================================== START $ckpt ===================================="
-        python postprocess_pretrained_ckpt.py --pretrained_checkpoint=$ckpt --output_dir=$output_dir --amp
+        python postprocess_pretrained_ckpt_ganzs.py --pretrained_checkpoint=$ckpt --output_dir=$output_dir --amp
         bash scripts/run_squad.sh $(source scripts/configs/squad_config.sh && rtx3090_1gpu_amp_local) train_eval;
         echo "====================================  END $ckpt  ====================================";
     done

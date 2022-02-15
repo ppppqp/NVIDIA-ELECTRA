@@ -337,7 +337,7 @@ def main(e2e_start_time):
     if is_main_process():
         utils.write_json(config.__dict__, pretrain_config_json)
         log("Configuration saved in {}".format(pretrain_config_json))
-    model = PretrainingModel(config)
+
     ### Start Setting up models
     disc_config = ElectraConfig(
             vocab_size=config.vocab_size,
@@ -358,6 +358,7 @@ def main(e2e_start_time):
         )
     disc_config.update({"amp": config.amp})
     discriminator = TFElectraForPreTraining(disc_config)
+    model = discriminator
     gen_config = get_generator_config(config, disc_config)
     gen_config.update({"amp": config.amp})
     if config.electra_objective:
@@ -413,7 +414,7 @@ def main(e2e_start_time):
         optimizer = tf.keras.mixed_precision.experimental.LossScaleOptimizer(optimizer, "dynamic")
     # Set up model checkpoint
     checkpoint = tf.train.Checkpoint(
-        step=tf.Variable(0), phase2=tf.Variable(False), optimizer=optimizer, model=model)
+        step=tf.Variable(0), phase2=tf.Variable(False), optimizer=optimizer, model=discriminator)
     manager = tf.train.CheckpointManager(checkpoint, config.checkpoints_dir, max_to_keep=config.keep_checkpoint_max)
     if config.restore_checkpoint and config.restore_checkpoint != "latest":
         checkpoint.restore(config.restore_checkpoint)
@@ -422,10 +423,11 @@ def main(e2e_start_time):
         checkpoint.restore(manager.latest_checkpoint)
         log(" ** Restored model checkpoint from {}".format(manager.latest_checkpoint))
     elif config.load_weights:
-        model.generator(model.generator.dummy_inputs)
-        model.discriminator(model.discriminator.dummy_inputs)
-        model.generator.load_weights(os.path.join(config.weights_dir, 'generator', 'tf_model.h5'))
-        model.discriminator.load_weights(os.path.join(config.weights_dir, 'discriminator', 'tf_model.h5'))
+        pass
+        # model.generator(model.generator.dummy_inputs)
+        # model.discriminator(model.discriminator.dummy_inputs)
+        # model.generator.load_weights(os.path.join(config.weights_dir, 'generator', 'tf_model.h5'))
+        # model.discriminator.load_weights(os.path.join(config.weights_dir, 'discriminator', 'tf_model.h5'))
     else:
         log(" ** Initializing from scratch.")
 
@@ -621,7 +623,7 @@ def main(e2e_start_time):
             config.train_batch_size * get_world_size() / (time.time() - iter_start))
         metrics["total_loss"].update_state(values=total_loss)
         metric_fn(config, metrics, eval_fn_inputs)
-
+        
         if (step % args.log_freq == 0) and (local_step % args.gradient_accumulation_steps == 0):
             log_info_dict = {k:float(v.result().numpy() * 100) if "accuracy" in k else float(v.result().numpy()) for k, v in metrics.items()}
             dllogger.log(step=(step,), data=log_info_dict, verbosity=0)

@@ -598,7 +598,7 @@ class TFElectraForPreTraining(TFElectraPreTrainedModel):
     def __init__(self, config, **kwargs):
         super().__init__(config, **kwargs)
 
-        self.electra = TFElectraMainLayer(config)
+        self.electra = TFElectraMainLayer(config, name="electra")
         self.discriminator_predictions = TFElectraDiscriminatorPredictions(config, name="discriminator_predictions")
 
     def get_input_embeddings(self):
@@ -1109,4 +1109,265 @@ class TFElectraForTokenClassification(TFElectraPreTrainedModel):
 
         return output  # (loss), scores, (hidden_states), (attentions)
 
+class TFPoolerStartLogits(tf.keras.Model):
+    """ Compute SQuAD start_logits from sequence hidden states. """
 
+    def __init__(self, config, *inputs, **kwargs):
+        super().__init__(*inputs, **kwargs)
+        self.dense = tf.keras.layers.Dense(
+            1, kernel_initializer=get_initializer(config.initializer_range), name="start_logit_pooler_dense"
+        )
+
+    def call(self, hidden_states, p_mask=None, next_layer_dtype=tf.float32):
+        """ Args:
+            **p_mask**: (`optional`) ``torch.FloatTensor`` of shape `(batch_size, seq_len)`
+                invalid position mask such as query and special symbols (PAD, SEP, CLS)
+                1.0 means token should be masked.
+        """
+        x = tf.squeeze(self.dense(hidden_states), axis=-1,
+                       name="squeeze_start_logit_pooler")
+
+        if p_mask is not None:
+            x = tf.cast(x, tf.float32) * (1 - p_mask) - 1e30 * p_mask
+
+        return x
+
+
+class TFPoolerEndLogits(tf.keras.Model):
+    """ Compute SQuAD end_logits from sequence hidden states and start token hidden state.
+    """
+
+    def __init__(self, config, *inputs, **kwargs):
+        super().__init__(*inputs, **kwargs)
+        self.dense_0 = tf.keras.layers.Dense(
+            config.hidden_size, kernel_initializer=get_initializer(config.initializer_range),
+            name="end_logit_pooler_dense_0"
+        )
+
+        self.activation = tf.keras.layers.Activation('tanh')  # nn.Tanh()
+        self.LayerNorm = tf.keras.layers.LayerNormalization(axis=-1, epsilon=config.layer_norm_eps,
+                                                            name="end_logit_pooler_LayerNorm")
+        self.dense_1 = tf.keras.layers.Dense(
+            1, kernel_initializer=get_initializer(config.initializer_range), name="end_logit_pooler_dense_1"
+        )
+
+    def call(self, hidden_states, start_states=None, start_positions=None, p_mask=None, training=False,
+             next_layer_dtype=tf.float32):
+        """ Args:
+            One of ``start_states``, ``start_positions`` should be not None.
+            If both are set, ``start_positions`` overrides ``start_states``.
+            **start_states**: ``torch.LongTensor`` of shape identical to hidden_states
+                hidden states of the first tokens for the labeled span.
+            **start_positions**: ``torch.LongTensor`` of shape ``(batch_size,)``
+                position of the first token for the labeled span:
+            **p_mask**: (`optional`) ``torch.FloatTensor`` of shape ``(batch_size, seq_len)``
+                Mask of invalid position such as query and special symbols (PAD, SEP, CLS)
+                1.0 means token should be masked.
+        """
+        assert (
+                start_states is not None or start_positions is not None
+        ), "One of start_states, start_positions should be not None"
+        if start_positions is not None and training:
+            bsz, slen, hsz = hidden_states.shape
+            start_states = tf.gather(hidden_states, start_positions[:, None], axis=1,
+                                     batch_dims=1)  # shape (bsz, 1, hsz)
+            start_states = tf.broadcast_to(start_states, (bsz, slen, hsz))  # shape (bsz, slen, hsz)
+
+        x = self.dense_0(tf.concat([hidden_states, start_states], axis=-1))
+        x = self.activation(x)
+        if training:
+            # since we are not doing beam search, add dimension with value=1. corresponds to dimension with top_k during inference - if not layernorm crashes
+            x = tf.expand_dims(x, axis=2)
+        x = self.LayerNorm(x)
+
+        if training:
+            # undo the additional dimension added above
+            x = tf.squeeze(self.dense_1(x), axis=[-1, -2])
+        else:
+            x = tf.squeeze(self.dense_1(x), axis=-1)
+
+        if p_mask is not None:
+            x = tf.cast(x, tf.float32) * (1 - p_mask) - 1e30 * p_mask
+
+        return x
+
+
+class TFPoolerAnswerClass(tf.keras.Model):
+    """ Compute SQuAD 2.0 answer class from classification and start tokens hidden states. """
+
+    def __init__(self, config, *inputs, **kwargs):
+        super().__init__(*inputs, **kwargs)
+        self.dense_0 = tf.keras.layers.Dense(
+            config.hidden_size, kernel_initializer=get_initializer(config.initializer_range),
+            name="pooler_answer_class_dense_0"
+        )
+
+        self.activation = tf.keras.layers.Activation('tanh')
+        self.dense_1 = tf.keras.layers.Dense(
+            1, use_bias=False, kernel_initializer=get_initializer(config.initializer_range),
+            name="pooler_answer_class_dense_1"
+        )
+
+    def call(self, hidden_states, start_states=None, start_positions=None, cls_index=None):
+        """
+        Args:
+            One of ``start_states``, ``start_positions`` should be not None.
+            If both are set, ``start_positions`` overrides ``start_states``.
+            **start_states**: ``torch.LongTensor`` of shape identical to ``hidden_states``.
+                hidden states of the first tokens for the labeled span.
+            **start_positions**: ``torch.LongTensor`` of shape ``(batch_size,)``
+                position of the first token for the labeled span.
+            **cls_index**: torch.LongTensor of shape ``(batch_size,)``
+                position of the CLS token. If None, take the last token.
+            note(Original repo):
+                no dependency on end_feature so that we can obtain one single `cls_logits`
+                for each sample
+        """
+        assert (
+                start_states is not None or start_positions is not None
+        ), "One of start_states, start_positions should be not None"
+        if start_positions is not None:
+            start_states = tf.gather(hidden_states, start_positions[:, None], axis=1,
+                                     batch_dims=1)  # shape (bsz, 1, hsz)
+            start_states = tf.squeeze(start_states, axis=1)  # shape (bsz, hsz)
+
+        if cls_index is not None:
+            cls_token_state = tf.gather(hidden_states, cls_index[:, None], axis=1, batch_dims=1)  # shape (bsz, 1, hsz)
+            cls_token_state = tf.squeeze(cls_token_state, axis=1)  # shape (bsz, hsz)
+        else:
+            cls_token_state = hidden_states[:, 0, :]  # shape (bsz, hsz)
+
+        x = self.dense_0(tf.concat([start_states, cls_token_state], axis=-1))
+        x = self.activation(x)
+        x = tf.squeeze(self.dense_1(x), axis=-1)
+
+        return x
+
+
+class TFElectraForQuestionAnswering(TFElectraPreTrainedModel):
+    def __init__(self, config, args):
+        super().__init__(config, args)
+
+        self.start_n_top = args.beam_size  # config.start_n_top
+        self.end_n_top = args.beam_size  # config.end_n_top
+        self.joint_head = args.joint_head
+        self.v2 = args.version_2_with_negative
+        self.electra = TFElectraMainLayer(config, name="electra")
+        self.num_hidden_layers = config.num_hidden_layers
+        self.amp = config.amp
+
+        ##old head
+        if not self.joint_head:
+            self.qa_outputs = tf.keras.layers.Dense(
+                2, kernel_initializer=get_initializer(config.initializer_range), name="qa_outputs")
+        else:
+            self.start_logits = TFPoolerStartLogits(config, name='start_logits')
+            self.end_logits = TFPoolerEndLogits(config, name='end_logits')
+            if self.v2:
+                self.answer_class = TFPoolerAnswerClass(config, name='answer_class')
+
+    def call(
+            self,
+            input_ids=None,
+            attention_mask=None,
+            token_type_ids=None,
+            start_positions=None,
+            end_positions=None,
+            cls_index=None,
+            p_mask=None,
+            is_impossible=None,
+            position_ids=None,
+            head_mask=None,
+            inputs_embeds=None,
+            training=False,
+    ):
+
+        outputs = self.electra(
+            input_ids = input_ids,
+            past_key_values = None,
+            attention_mask = attention_mask,
+            token_type_ids = token_type_ids,
+            position_ids = position_ids,
+            head_mask = head_mask,
+            inputs_embeds = inputs_embeds,
+            training=training,
+        )
+        discriminator_sequence_output = outputs[0]
+
+        # Simple head model
+        if not self.joint_head:
+            logits = self.qa_outputs(discriminator_sequence_output)
+            [start_logits, end_logits] = tf.split(logits, 2, axis=-1)
+            start_logits = tf.squeeze(start_logits, axis=-1, name="squeeze_start_logit")
+            end_logits = tf.squeeze(end_logits, axis=-1, name="squeeze_end_logit")
+            outputs = (start_logits, end_logits) + outputs
+            return outputs
+
+        start_logits = self.start_logits(discriminator_sequence_output, p_mask=p_mask,
+                                         next_layer_dtype=self.end_logits.dense_0.dtype)
+        if training:  # start_positions is not None and end_positions is not None:
+
+            # during training, compute the end logits based on the ground truth of the start position
+            end_logits = self.end_logits(discriminator_sequence_output, start_positions=start_positions, p_mask=p_mask,
+                                         training=training,
+                                         next_layer_dtype=tf.float16 if self.amp else tf.float32)
+
+            if self.v2:  # cls_index is not None:#cls_index is not None and is_impossible is not None:
+                # Predict answerability from the representation of CLS and START
+                cls_logits = self.answer_class(discriminator_sequence_output, start_positions=start_positions,
+                                               cls_index=cls_index)
+
+            else:
+                cls_logits = None
+
+            outputs = (start_logits, end_logits, cls_logits) + outputs
+
+        else:
+            # during inference, compute the end logits based on beam search
+            bsz, slen, hsz = discriminator_sequence_output.shape
+            start_n_top = min(self.start_n_top, slen)
+            end_n_top = min(self.end_n_top, slen)
+            start_log_probs = tf.nn.log_softmax(start_logits, axis=-1, name="start_logit_softmax")  # shape (bsz, slen)
+
+            start_top_log_probs, start_top_index = tf.math.top_k(start_log_probs, k=start_n_top,
+                                                                 name="start_log_probs_top_k")
+
+            start_states = tf.gather(discriminator_sequence_output, start_top_index, axis=1,
+                                     batch_dims=1)  # shape (bsz, start_n_top, hsz)
+            start_states = tf.broadcast_to(tf.expand_dims(start_states, axis=1),
+                                           [bsz, slen, start_n_top, hsz])  # shape (bsz, slen, start_n_top, hsz)
+
+            discriminator_sequence_output_expanded = tf.broadcast_to(
+                tf.expand_dims(discriminator_sequence_output, axis=2),
+                list(start_states.shape))  # shape (bsz, slen, start_n_top, hsz)
+
+            p_mask = tf.expand_dims(p_mask, axis=-1) if p_mask is not None else None
+            end_logits = self.end_logits(discriminator_sequence_output_expanded, start_states=start_states,
+                                         p_mask=p_mask, next_layer_dtype=tf.float16 if self.amp else tf.float32)  # self.answer_class.dense_0.dtype)
+            end_log_probs = tf.nn.log_softmax(end_logits, axis=1,
+                                              name="end_logit_softmax")  # shape (bsz, slen, start_n_top)
+
+            # need to transpose because tf.math.top_k works on default axis=-1
+            end_log_probs = tf.transpose(end_log_probs, perm=[0, 2, 1])
+            end_top_log_probs, end_top_index = tf.math.top_k(
+                end_log_probs, k=end_n_top)  # shape (bsz, end_n_top, start_n_top).perm(0,2,1)
+            end_top_log_probs = tf.reshape(end_top_log_probs, (
+                -1, start_n_top * end_n_top))  # shape (bsz, self.start_n_top * self.end_n_top)
+            end_top_index = tf.reshape(end_top_index,
+                                       (-1, start_n_top * end_n_top))  # shape (bsz, self.start_n_top * self.end_n_top)
+            if self.v2:  # cls_index is not None:
+                start_p = tf.nn.softmax(start_logits, axis=-1, name="start_softmax")
+                start_states = tf.einsum(
+                    "blh,bl->bh", discriminator_sequence_output, tf.cast(start_p, tf.float16) if self.amp else start_p
+                )  # get the representation of START as weighted sum of hidden states
+                # explicitly setting cls_index to None
+                cls_logits = self.answer_class(
+                    discriminator_sequence_output, start_states=start_states, cls_index=None)
+                # one single `cls_logits` for each sample
+            else:
+                cls_logits = tf.fill([bsz], 0.0)
+
+            outputs = (start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits) + outputs
+
+        # return start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits
+        return outputs

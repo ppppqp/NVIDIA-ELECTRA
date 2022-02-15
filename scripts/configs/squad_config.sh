@@ -25,7 +25,7 @@ rtx3090_1gpu_amp_local ()
     seed="1"
     SQUAD_VERSION="1.1"
     squad_dir="/workspace/electra/data/download/squad/v$SQUAD_VERSION"
-    OUT_DIR="results/"
+    OUT_DIR="test_results/"
     init_checkpoint="checkpoints/electra_base_qa_v2_False_epoch_2_ckpt"
     echo $electra_model $epochs $batch_size $infer_batch_size $learning_rate \
      $precision $num_gpu $seed $SQUAD_VERSION $squad_dir \

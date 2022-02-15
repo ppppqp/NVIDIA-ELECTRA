@@ -33,8 +33,14 @@ else:
 from tqdm import tqdm
 import dllogger
 from utils import is_main_process, format_step, get_rank, get_world_size, log
-from configuration import ElectraConfig
-from modeling import TFElectraForQuestionAnswering
+
+
+#FIXME
+from modeling_ganzs import TFElectraForQuestionAnswering, TFElectraForMaskedLM
+# from configuration import ElectraConfig
+from configuration_ganzs import ElectraConfig
+#FIXME
+
 from tokenization import ElectraTokenizer
 from optimization import create_optimizer
 from squad_utils import SquadV1Processor, SquadV2Processor, squad_convert_examples_to_features, \
@@ -363,6 +369,7 @@ def main():
         log("***** Loading tokenizer and model *****")
     # Load tokenizer and model from pretrained model/vocabulary. Specify the number of labels to classify (2+: classification, 1: regression)
     electra_model = args.electra_model
+    tf.print("model:", electra_model)
     config = ElectraConfig.from_pretrained(electra_model, cache_dir=args.cache_dir)
     config.update({"amp": args.amp})
     if args.vocab_file is None:
@@ -373,7 +380,6 @@ def main():
             do_lower_case=args.do_lower_case)
 
     model = TFElectraForQuestionAnswering.from_pretrained(electra_model, config=config, cache_dir=args.cache_dir, args=args)
-
     if is_main_process():
         log("***** Loading dataset *****")
     # Load data
