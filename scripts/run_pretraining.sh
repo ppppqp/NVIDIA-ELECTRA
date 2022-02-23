@@ -121,51 +121,51 @@ set +x
 
 echo "finished pretraining phase1"
 
-#Start Phase2
-ACCUMULATE_GRADIENTS=""
-if [ "$accumulate_gradients" == "true" ] ; then
-   ACCUMULATE_GRADIENTS="--gradient_accumulation_steps=$gradient_accumulation_steps_p2"
-fi
+# #Start Phase2
+# ACCUMULATE_GRADIENTS=""
+# if [ "$accumulate_gradients" == "true" ] ; then
+#    ACCUMULATE_GRADIENTS="--gradient_accumulation_steps=$gradient_accumulation_steps_p2"
+# fi
 
-RESTORE_CHECKPOINT=""
-if [ "$restore_checkpoint" == "true" ] ; then
-   RESTORE_CHECKPOINT="--restore_checkpoint=latest --phase2"
-fi
+# RESTORE_CHECKPOINT=""
+# if [ "$restore_checkpoint" == "true" ] ; then
+#    RESTORE_CHECKPOINT="--restore_checkpoint=latest --phase2"
+# fi
 
-CMD=" $CODEDIR/run_pretraining.py"
-CMD+=" --model_name=${ELECTRA_MODEL}"
-CMD+=" --pretrain_tfrecords=$DATA_DIR_P2"
-CMD+=" --model_size=${ELECTRA_MODEL}"
-CMD+=" --train_batch_size=$train_batch_size_p2"
-CMD+=" --max_seq_length=512 --disc_weight=50.0 --generator_hidden_size=0.3333333 ${RESTORE_CHECKPOINT}"
-CMD+=" --num_train_steps=$train_steps_p2"
-CMD+=" --num_warmup_steps=$warmup_steps_p2"
-CMD+=" --save_checkpoints_steps=$save_checkpoint_steps"
-CMD+=" --learning_rate=$learning_rate_p2"
-CMD+=" --optimizer=${optimizer} --skip_adaptive --opt_beta_1=0.878 --opt_beta_2=0.974 --lr_decay_power=0.5"
-CMD+=" --seed=$seed"
-CMD+=" $PREC"
-CMD+=" $ACCUMULATE_GRADIENTS"
-CMD+=" --log_dir ${RESULTS_DIR} "
+# CMD=" $CODEDIR/run_pretraining.py"
+# CMD+=" --model_name=${ELECTRA_MODEL}"
+# CMD+=" --pretrain_tfrecords=$DATA_DIR_P2"
+# CMD+=" --model_size=${ELECTRA_MODEL}"
+# CMD+=" --train_batch_size=$train_batch_size_p2"
+# CMD+=" --max_seq_length=512 --disc_weight=50.0 --generator_hidden_size=0.3333333 ${RESTORE_CHECKPOINT}"
+# CMD+=" --num_train_steps=$train_steps_p2"
+# CMD+=" --num_warmup_steps=$warmup_steps_p2"
+# CMD+=" --save_checkpoints_steps=$save_checkpoint_steps"
+# CMD+=" --learning_rate=$learning_rate_p2"
+# CMD+=" --optimizer=${optimizer} --skip_adaptive --opt_beta_1=0.878 --opt_beta_2=0.974 --lr_decay_power=0.5"
+# CMD+=" --seed=$seed"
+# CMD+=" $PREC"
+# CMD+=" $ACCUMULATE_GRADIENTS"
+# CMD+=" --log_dir ${RESULTS_DIR} "
 
-CMD="$PREFIX python3 $CMD"
-echo "Launch command: $CMD"
+# CMD="$PREFIX python3 $CMD"
+# echo "Launch command: $CMD"
 
 
-printf -v TAG "electra_pretraining_phase2_%s" "$precision"
-DATESTAMP=`date +'%y%m%d%H%M%S'`
-LOGFILE=$RESULTS_DIR/$job_name.$TAG.$DATESTAMP.log
-printf "Logs written to %s\n" "$LOGFILE"
+# printf -v TAG "electra_pretraining_phase2_%s" "$precision"
+# DATESTAMP=`date +'%y%m%d%H%M%S'`
+# LOGFILE=$RESULTS_DIR/$job_name.$TAG.$DATESTAMP.log
+# printf "Logs written to %s\n" "$LOGFILE"
 
-set -x
-if [ -z "$LOGFILE" ] ; then
-   $CMD
-else
-   (
-     $CMD
-   ) |& tee $LOGFILE
-fi
+# set -x
+# if [ -z "$LOGFILE" ] ; then
+#    $CMD
+# else
+#    (
+#      $CMD
+#    ) |& tee $LOGFILE
+# fi
 
-set +x
+# set +x
 
 echo "finished pretraining phase2"

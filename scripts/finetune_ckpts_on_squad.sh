@@ -13,7 +13,18 @@
 # limitations under the License.
 
 # checkpoints=${checkpoints:-"results/models/base/checkpoints"}
-checkpoints=${checkpoints:-"test_results/models/base/checkpoints"}
+mode=$1
+# checkpoints=${checkpoints:-"test_results/models/base/checkpoints"}
+if [[ mode == "ganzs" ]]
+then
+    src=postprocess_pretrained_ckpt_ganzs.py
+    checkpoints=test_results/models/base/checkpoints
+    electra_model=test_results/models/base/checkpoints/discriminator
+else
+    src=postprocess_pretrained_ckpt.py
+    checkpoints=results/models/test/checkpoints
+    electra_model=results/models/test/checkpoints/discriminator
+fi
 
 for folder in $checkpoints; do
 
