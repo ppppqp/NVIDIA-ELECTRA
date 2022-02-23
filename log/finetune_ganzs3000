@@ -1,0 +1,1084 @@
+==================================== START test_results/models/base/checkpoints/ckpt-3000 ====================================
+Compute dtype: float16
+Variable dtype: float32
+ ** Restored from test_results/models/base/checkpoints/ckpt-3000 at step 3000
+================================================================================
+ ** Saving discriminator
+================================================================================
+Configuration saved in test_results/models/base/checkpoints/discriminator/config.json
+Model weights saved in test_results/models/base/checkpoints/discriminator/tf_model.h5: {'electra', 'discriminator_predictions'}
+Container nvidia build =  14714731
+out dir is test_results/
+mixed-precision training and xla activated!
+Running SQuAD-v1.1
+   python run_tf_squad.py --init_checkpoint=checkpoints/electra_base_qa_v2_False_epoch_2_ckpt  --do_train  --train_batch_size=32 --do_predict --predict_batch_size=512 --eval_script=/workspace/electra/data/download/squad/v1.1/evaluate-v1.1.py --do_eval    --data_dir /workspace/electra/data/download/squad/v1.1  --do_lower_case  --electra_model=test_results/models/base/checkpoints/discriminator  --learning_rate=8e-4  --warmup_proportion 0.05  --weight_decay_rate 0.01  --layerwise_lr_decay 0.8  --seed=1  --num_train_epochs=2  --max_seq_length=384  --doc_stride=128  --beam_size 5  --joint_head True  --null_score_diff_threshold -5.6  --output_dir=test_results/   --amp --xla  --cache_dir=/workspace/electra/data/download/squad/v1.1  --max_steps=-1  --vocab_file=/workspace/electra/vocab/vocab.txt  |& tee test_results//logfile.txt
+2022-02-14 16:35:39.391478: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+Running total processes: 1
+Starting process: 0
+2022-02-14 16:35:40.241547: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcuda.so.1
+2022-02-14 16:35:40.257090: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.257622: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.74GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-02-14 16:35:40.257640: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:35:40.259071: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+2022-02-14 16:35:40.259681: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
+2022-02-14 16:35:40.259849: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
+2022-02-14 16:35:40.261334: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
+2022-02-14 16:35:40.261765: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.11
+2022-02-14 16:35:40.261865: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:35:40.261911: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.262403: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.262840: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2022-02-14 16:35:40.268060: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 3600000000 Hz
+2022-02-14 16:35:40.268531: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7ff8fc000b20 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2022-02-14 16:35:40.268543: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2022-02-14 16:35:40.412536: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.413053: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7ff7fc000b20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2022-02-14 16:35:40.413066: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce RTX 3090, Compute Capability 8.6
+2022-02-14 16:35:40.413176: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.413653: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.74GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-02-14 16:35:40.413671: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:35:40.413695: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+2022-02-14 16:35:40.413705: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
+2022-02-14 16:35:40.413718: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
+2022-02-14 16:35:40.413729: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
+2022-02-14 16:35:40.413739: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.11
+2022-02-14 16:35:40.413748: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:35:40.413779: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.414210: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.414619: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2022-02-14 16:35:40.414635: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:35:40.584283: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2022-02-14 16:35:40.584310: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 
+2022-02-14 16:35:40.584314: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N 
+2022-02-14 16:35:40.584435: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.584897: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:35:40.585366: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 22444 MB memory) -> physical GPU (device: 0, name: GeForce RTX 3090, pci bus id: 0000:01:00.0, compute capability: 8.6)
+DLL 2022-02-14 16:35:40.240913 - PARAMETER SEED : 1 
+Compute dtype: float16
+Variable dtype: float32
+***** Loading tokenizer and model *****
+model: test_results/models/base/checkpoints/discriminator
+loading configuration file test_results/models/base/checkpoints/discriminator/config.json
+loading weights file test_results/models/base/checkpoints/discriminator/tf_model.h5
+2022-02-14 16:35:40.651721: W tensorflow/python/util/util.cc:329] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
+2022-02-14 16:35:40.692028: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+WARNING:tensorflow:Layer activation_2 is casting an input tensor from dtype float16 to the layer's dtype of float32, which is new behavior in TensorFlow 2.  The layer has dtype float32 because it's dtype defaults to floatx.
+
+If you intended to run this layer in float32, you can safely ignore this warning. If in doubt, this warning is likely only an issue if you are porting a TensorFlow 1.X model to TensorFlow 2.
+
+To change all layers to have dtype float16 by default, call `tf.keras.backend.set_floatx('float16')`. To change just this layer, pass dtype='float16' to the layer constructor. If you are the author of this layer, you can disable autocasting by passing autocast=False to the base Layer constructor.
+
+Some weights of the model checkpoint at test_results/models/base/checkpoints/discriminator were not used when initializing TFElectraForQuestionAnswering: ['discriminator_predictions']
+
+Some weights of TFElectraForQuestionAnswering were not initialized from the model checkpoint at test_results/models/base/checkpoints/discriminator and are newly initialized: ['start_logits', 'end_logits']
+
+weights loaded
+***** Loading dataset *****
+  0%|          | 0/442 [00:00<?, ?it/s] 36%|███▌      | 158/442 [00:05<00:09, 31.55it/s] 66%|██████▌   | 292/442 [00:10<00:05, 29.91it/s] 98%|█████████▊| 432/442 [00:15<00:00, 29.30it/s]100%|██████████| 442/442 [00:15<00:00, 28.64it/s]
+  0%|          | 0/48 [00:00<?, ?it/s]100%|██████████| 48/48 [00:01<00:00, 26.58it/s]***** Loading features *****
+***** Running training *****
+  Num examples =  88641
+  Num Epochs =  2
+  Instantaneous batch size per GPU =  32
+  Total train batch size (w. parallel, distributed & accumulation) =  32
+  Total optimization steps = 5541
+
+Iteration:   0%|          | 0/2771 [00:00<?, ?it/s]2022-02-14 16:36:39.150477: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1631] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+2022-02-14 16:36:40.020702: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 16:36:40.047099: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:36:40.665056: W tensorflow/stream_executor/gpu/redzone_allocator.cc:314] Internal: ptxas exited with non-zero error code 65280, output: ptxas fatal   : Value 'sm_86' is not defined for option 'gpu-name'
+
+Relying on driver to perform ptx compilation. 
+Modify $PATH to customize ptxas location.
+This message will be only logged once.
+2022-02-14 16:36:40.953636: W tensorflow/compiler/xla/service/gpu/buffer_comparator.cc:592] Internal: ptxas exited with non-zero error code 65280, output: ptxas fatal   : Value 'sm_86' is not defined for option 'gpu-name'
+
+Relying on driver to perform ptx compilation. 
+Setting XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda  or modifying $PATH can be used to set the location of ptxas
+This message will only be logged once.
+2022-02-14 16:39:46.521204: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:39:49.761398: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:39:49.761417: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:39:49.761423: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:39:49.761425: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:39:49.761427: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:39:49.761429: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:39:49.775179: I tensorflow/compiler/jit/xla_compilation_cache.cc:241] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2022-02-14 16:39:51.755407: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:39:51.897006: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:39:51.897023: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:39:51.897028: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:39:51.897030: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:39:51.897032: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:39:51.897034: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:39:51.957243: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:39:52.143574: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:39:52.143593: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:39:52.143599: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:39:52.143601: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:39:52.143603: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:39:52.143604: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:39:52.364806: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:39:53.141011: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:39:53.141030: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:39:53.141036: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:39:53.141038: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:39:53.141040: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:39:53.141042: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+
+Epoch: 000, Step:     0, Loss:  5.20175171, Perf:    0, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1
+/usr/local/lib/python3.6/dist-packages/tensorflow/python/framework/indexed_slices.py:434: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+Iteration:   0%|          | 1/2771 [03:22<156:05:29, 202.86s/it]2022-02-14 16:39:56.229189: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 16:39:57.552314: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:00.817231: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:40:00.817249: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:40:00.817255: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:40:00.817257: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:40:00.817259: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:40:00.817261: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:40:02.757825: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:02.848208: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:03.141955: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:04.152575: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:04.275138: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:40:04.275156: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:40:04.275163: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:40:04.275165: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:40:04.275167: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:40:04.275169: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:   0%|          | 2/2771 [03:33<111:42:03, 145.22s/it]DLL 2022-02-14 16:39:53.579835 - Training Epoch: 0 Training Iteration: 0  step_loss : 5.201751708984375  train_perf : 0.1579732894897461 
+
+Epoch: 000, Step:    50, Loss:  4.98424673, Perf:  471, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=51, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:51
+Iteration:   3%|▎         | 78/2771 [03:38<76:03:34, 101.68s/it]DLL 2022-02-14 16:40:07.574822 - Training Epoch: 0 Training Iteration: 50  step_loss : 4.984246730804443  train_perf : 470.97576904296875 
+
+Epoch: 000, Step:   100, Loss:  4.59984732, Perf:  482, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=101, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:101
+DLL 2022-02-14 16:40:10.883602 - Training Epoch: 0 Training Iteration: 100  step_loss : 4.599847316741943  train_perf : 481.952392578125 
+
+Epoch: 000, Step:   150, Loss:  4.02609444, Perf:  486, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=151, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:151
+Iteration:   6%|▌         | 154/2771 [03:43<51:45:12, 71.19s/it]DLL 2022-02-14 16:40:14.186456 - Training Epoch: 0 Training Iteration: 150  step_loss : 4.026094436645508  train_perf : 485.96197509765625 
+
+Epoch: 000, Step:   200, Loss:  3.80334234, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=201, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:201
+Iteration:   8%|▊         | 230/2771 [03:48<35:11:21, 49.86s/it]DLL 2022-02-14 16:40:17.471481 - Training Epoch: 0 Training Iteration: 200  step_loss : 3.803342342376709  train_perf : 488.5532531738281 
+
+Epoch: 000, Step:   250, Loss:  3.67019153, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=251, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:251
+2022-02-14 16:40:22.550599: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:22.665517: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:40:22.665535: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:40:22.665541: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:40:22.665543: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:40:22.665545: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:40:22.665561: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:40:23.889326: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:40:24.009341: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:40:24.009360: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:40:24.009366: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:40:24.009368: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:40:24.009370: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:40:24.009372: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+DLL 2022-02-14 16:40:20.777005 - Training Epoch: 0 Training Iteration: 250  step_loss : 3.670191526412964  train_perf : 489.577392578125 
+
+Epoch: 000, Step:   300, Loss:  3.52332830, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=5, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:300
+Iteration:  11%|█         | 302/2771 [03:53<23:56:56, 34.92s/it]DLL 2022-02-14 16:40:24.373694 - Training Epoch: 0 Training Iteration: 300  step_loss : 3.5233283042907715  train_perf : 488.0998840332031 
+
+Epoch: 000, Step:   350, Loss:  4.21611738, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=1024.0, num_good_steps=11, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:346
+Iteration:  14%|█▎        | 379/2771 [03:58<16:15:16, 24.46s/it]DLL 2022-02-14 16:40:27.648507 - Training Epoch: 0 Training Iteration: 350  step_loss : 4.2161173820495605  train_perf : 489.5087585449219 
+
+Epoch: 000, Step:   400, Loss:  4.09494162, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=512.0, num_good_steps=33, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:395
+DLL 2022-02-14 16:40:30.942443 - Training Epoch: 0 Training Iteration: 400  step_loss : 4.09494161605835  train_perf : 490.2204895019531 
+
+Epoch: 000, Step:   450, Loss:  3.74905968, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=512.0, num_good_steps=83, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:445
+Iteration:  16%|█▋        | 455/2771 [04:03<11:01:46, 17.14s/it]DLL 2022-02-14 16:40:34.251876 - Training Epoch: 0 Training Iteration: 450  step_loss : 3.7490596771240234  train_perf : 490.5229797363281 
+
+Epoch: 000, Step:   500, Loss:  3.93856144, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=0, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:494
+Iteration:  19%|█▉        | 531/2771 [04:08<7:28:46, 12.02s/it] DLL 2022-02-14 16:40:37.551557 - Training Epoch: 0 Training Iteration: 500  step_loss : 3.93856143951416  train_perf : 490.90667724609375 
+
+Epoch: 000, Step:   550, Loss:  4.17144060, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=50, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:544
+DLL 2022-02-14 16:40:40.860364 - Training Epoch: 0 Training Iteration: 550  step_loss : 4.171440601348877  train_perf : 491.0926208496094 
+
+Epoch: 000, Step:   600, Loss:  3.61127996, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=100, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:594
+Iteration:  22%|██▏       | 607/2771 [04:13<5:04:12,  8.43s/it]DLL 2022-02-14 16:40:44.161268 - Training Epoch: 0 Training Iteration: 600  step_loss : 3.6112799644470215  train_perf : 491.33465576171875 
+
+Epoch: 000, Step:   650, Loss:  4.13674450, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=150, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:644
+Iteration:  25%|██▍       | 683/2771 [04:18<3:26:09,  5.92s/it]DLL 2022-02-14 16:40:47.470061 - Training Epoch: 0 Training Iteration: 650  step_loss : 4.136744499206543  train_perf : 491.4720153808594 
+
+Epoch: 000, Step:   700, Loss:  3.78084683, Perf:  492, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=200, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:694
+DLL 2022-02-14 16:40:50.774565 - Training Epoch: 0 Training Iteration: 700  step_loss : 3.7808468341827393  train_perf : 491.6298522949219 
+
+Epoch: 000, Step:   750, Loss:  3.56132984, Perf:  492, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=250, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:744
+Iteration:  27%|██▋       | 759/2771 [04:23<2:19:43,  4.17s/it]DLL 2022-02-14 16:40:54.087029 - Training Epoch: 0 Training Iteration: 750  step_loss : 3.5613298416137695  train_perf : 491.69171142578125 
+
+Epoch: 000, Step:   800, Loss:  3.77034664, Perf:  492, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=300, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:794
+Iteration:  30%|███       | 835/2771 [04:28<1:34:45,  2.94s/it]DLL 2022-02-14 16:40:57.409084 - Training Epoch: 0 Training Iteration: 800  step_loss : 3.7703466415405273  train_perf : 491.6498107910156 
+
+Epoch: 000, Step:   850, Loss:  4.01386261, Perf:  492, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=350, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:844
+DLL 2022-02-14 16:41:00.737914 - Training Epoch: 0 Training Iteration: 850  step_loss : 4.013862609863281  train_perf : 491.5498046875 
+
+Epoch: 000, Step:   900, Loss:  3.55335426, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=400, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:894
+Iteration:  33%|███▎      | 911/2771 [04:34<1:04:20,  2.08s/it]DLL 2022-02-14 16:41:04.065673 - Training Epoch: 0 Training Iteration: 900  step_loss : 3.553354263305664  train_perf : 491.491455078125 
+
+Epoch: 000, Step:   950, Loss:  4.00444174, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=43, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:943
+Iteration:  36%|███▌      | 987/2771 [04:39<43:47,  1.47s/it]  DLL 2022-02-14 16:41:07.382681 - Training Epoch: 0 Training Iteration: 950  step_loss : 4.004441738128662  train_perf : 491.4889831542969 
+
+Epoch: 000, Step:  1000, Loss:  3.90308642, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=93, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:993
+DLL 2022-02-14 16:41:10.704181 - Training Epoch: 0 Training Iteration: 1000  step_loss : 3.9030864238739014  train_perf : 491.4641418457031 
+
+Epoch: 000, Step:  1050, Loss:  3.72522855, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=143, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1043
+Iteration:  38%|███▊      | 1063/2771 [04:44<29:54,  1.05s/it]DLL 2022-02-14 16:41:14.028113 - Training Epoch: 0 Training Iteration: 1050  step_loss : 3.7252285480499268  train_perf : 491.439208984375 
+
+Epoch: 000, Step:  1100, Loss:  4.53216457, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=193, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1093
+Iteration:  41%|████      | 1139/2771 [04:49<20:33,  1.32it/s]DLL 2022-02-14 16:41:17.352801 - Training Epoch: 0 Training Iteration: 1100  step_loss : 4.532164573669434  train_perf : 491.3965148925781 
+
+Epoch: 000, Step:  1150, Loss:  4.26151848, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=243, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1143
+DLL 2022-02-14 16:41:20.677255 - Training Epoch: 0 Training Iteration: 1150  step_loss : 4.261518478393555  train_perf : 491.3673400878906 
+
+Epoch: 000, Step:  1200, Loss:  3.80708265, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=293, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1193
+Iteration:  44%|████▍     | 1215/2771 [04:54<14:14,  1.82it/s]DLL 2022-02-14 16:41:24.005699 - Training Epoch: 0 Training Iteration: 1200  step_loss : 3.8070826530456543  train_perf : 491.30657958984375 
+
+Epoch: 000, Step:  1250, Loss:  4.11074257, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=343, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1243
+Iteration:  47%|████▋     | 1291/2771 [04:59<09:58,  2.47it/s]DLL 2022-02-14 16:41:27.333908 - Training Epoch: 0 Training Iteration: 1250  step_loss : 4.110742568969727  train_perf : 491.2547912597656 
+
+Epoch: 000, Step:  1300, Loss:  3.93473911, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=393, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1293
+DLL 2022-02-14 16:41:30.655280 - Training Epoch: 0 Training Iteration: 1300  step_loss : 3.934739112854004  train_perf : 491.2462158203125 
+
+Epoch: 000, Step:  1350, Loss:  4.14675236, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=443, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1343
+Iteration:  49%|████▉     | 1367/2771 [05:04<07:05,  3.30it/s]DLL 2022-02-14 16:41:33.978173 - Training Epoch: 0 Training Iteration: 1350  step_loss : 4.14675235748291  train_perf : 491.2253112792969 
+
+Epoch: 000, Step:  1400, Loss:  4.18504238, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=493, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1393
+Iteration:  52%|█████▏    | 1443/2771 [05:09<05:07,  4.31it/s]DLL 2022-02-14 16:41:37.304081 - Training Epoch: 0 Training Iteration: 1400  step_loss : 4.185042381286621  train_perf : 491.1936950683594 
+
+Epoch: 000, Step:  1450, Loss:  4.01860380, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=543, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1443
+DLL 2022-02-14 16:41:40.625149 - Training Epoch: 0 Training Iteration: 1450  step_loss : 4.018603801727295  train_perf : 491.177978515625 
+
+Epoch: 000, Step:  1500, Loss:  4.18420839, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=593, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1493
+Iteration:  55%|█████▍    | 1519/2771 [05:14<03:48,  5.49it/s]DLL 2022-02-14 16:41:43.948103 - Training Epoch: 0 Training Iteration: 1500  step_loss : 4.184208393096924  train_perf : 491.1591796875 
+
+Epoch: 000, Step:  1550, Loss:  4.02680922, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=643, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1543
+Iteration:  58%|█████▊    | 1595/2771 [05:19<02:53,  6.78it/s]DLL 2022-02-14 16:41:47.277267 - Training Epoch: 0 Training Iteration: 1550  step_loss : 4.026809215545654  train_perf : 491.117431640625 
+
+Epoch: 000, Step:  1600, Loss:  3.91128683, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=693, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1593
+DLL 2022-02-14 16:41:50.605495 - Training Epoch: 0 Training Iteration: 1600  step_loss : 3.9112868309020996  train_perf : 491.0830078125 
+
+Epoch: 000, Step:  1650, Loss:  4.01090527, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=743, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1643
+Iteration:  60%|██████    | 1671/2771 [05:24<02:15,  8.11it/s]DLL 2022-02-14 16:41:53.934191 - Training Epoch: 0 Training Iteration: 1650  step_loss : 4.0109052658081055  train_perf : 491.0439758300781 
+
+Epoch: 000, Step:  1700, Loss:  4.08703375, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=793, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1693
+Iteration:  63%|██████▎   | 1747/2771 [05:29<01:48,  9.41it/s]DLL 2022-02-14 16:41:57.257893 - Training Epoch: 0 Training Iteration: 1700  step_loss : 4.087033748626709  train_perf : 491.02752685546875 
+
+Epoch: 000, Step:  1750, Loss:  4.16115427, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=843, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1743
+DLL 2022-02-14 16:42:00.582855 - Training Epoch: 0 Training Iteration: 1750  step_loss : 4.161154270172119  train_perf : 491.009521484375 
+
+Epoch: 000, Step:  1800, Loss:  3.89251518, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=893, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1793
+Iteration:  66%|██████▌   | 1823/2771 [05:34<01:29, 10.60it/s]DLL 2022-02-14 16:42:03.913004 - Training Epoch: 0 Training Iteration: 1800  step_loss : 3.892515182495117  train_perf : 490.9658203125 
+
+Epoch: 000, Step:  1850, Loss:  3.94451809, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=943, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1843
+Iteration:  69%|██████▊   | 1899/2771 [05:39<01:14, 11.63it/s]DLL 2022-02-14 16:42:07.239179 - Training Epoch: 0 Training Iteration: 1850  step_loss : 3.9445180892944336  train_perf : 490.9462585449219 
+
+Epoch: 000, Step:  1900, Loss:  3.84662628, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=993, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1893
+DLL 2022-02-14 16:42:10.568235 - Training Epoch: 0 Training Iteration: 1900  step_loss : 3.8466262817382812  train_perf : 490.91583251953125 
+
+Epoch: 000, Step:  1950, Loss:  3.83195925, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1043, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1943
+Iteration:  71%|███████▏  | 1975/2771 [05:44<01:03, 12.48it/s]DLL 2022-02-14 16:42:13.891123 - Training Epoch: 0 Training Iteration: 1950  step_loss : 3.8319592475891113  train_perf : 490.90191650390625 
+
+Epoch: 000, Step:  2000, Loss:  4.18140745, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1093, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1993
+DLL 2022-02-14 16:42:17.216798 - Training Epoch: 0 Training Iteration: 2000  step_loss : 4.181407451629639  train_perf : 490.8831787109375 
+
+Epoch: 000, Step:  2050, Loss:  3.93873811, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1143, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2043
+Iteration:  74%|███████▍  | 2051/2771 [05:49<00:54, 13.15it/s]DLL 2022-02-14 16:42:20.545079 - Training Epoch: 0 Training Iteration: 2050  step_loss : 3.9387381076812744  train_perf : 490.8570251464844 
+
+Epoch: 000, Step:  2100, Loss:  3.92870688, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1193, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2093
+Iteration:  77%|███████▋  | 2127/2771 [05:54<00:47, 13.67it/s]DLL 2022-02-14 16:42:23.864980 - Training Epoch: 0 Training Iteration: 2100  step_loss : 3.9287068843841553  train_perf : 490.8568115234375 
+
+Epoch: 000, Step:  2150, Loss:  3.87803316, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1243, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2143
+DLL 2022-02-14 16:42:27.189190 - Training Epoch: 0 Training Iteration: 2150  step_loss : 3.87803316116333  train_perf : 490.8465881347656 
+
+Epoch: 000, Step:  2200, Loss:  3.84795237, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1293, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2193
+Iteration:  80%|███████▉  | 2203/2771 [05:59<00:40, 14.05it/s]DLL 2022-02-14 16:42:30.517659 - Training Epoch: 0 Training Iteration: 2200  step_loss : 3.847952365875244  train_perf : 490.82415771484375 
+
+Epoch: 000, Step:  2250, Loss:  3.88850141, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1343, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2243
+Iteration:  82%|████████▏ | 2279/2771 [06:04<00:34, 14.33it/s]DLL 2022-02-14 16:42:33.845066 - Training Epoch: 0 Training Iteration: 2250  step_loss : 3.8885014057159424  train_perf : 490.80047607421875 
+
+Epoch: 000, Step:  2300, Loss:  3.94019985, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1393, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2293
+DLL 2022-02-14 16:42:37.171535 - Training Epoch: 0 Training Iteration: 2300  step_loss : 3.940199851989746  train_perf : 490.78558349609375 
+
+Epoch: 000, Step:  2350, Loss:  3.80401516, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1443, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2343
+Iteration:  85%|████████▍ | 2355/2771 [06:10<00:28, 14.53it/s]DLL 2022-02-14 16:42:40.494163 - Training Epoch: 0 Training Iteration: 2350  step_loss : 3.8040151596069336  train_perf : 490.7833251953125 
+
+Epoch: 000, Step:  2400, Loss:  3.85189247, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1493, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2393
+Iteration:  88%|████████▊ | 2431/2771 [06:15<00:23, 14.68it/s]DLL 2022-02-14 16:42:43.816065 - Training Epoch: 0 Training Iteration: 2400  step_loss : 3.8518924713134766  train_perf : 490.77484130859375 
+
+Epoch: 000, Step:  2450, Loss:  3.92793036, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1543, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2443
+DLL 2022-02-14 16:42:47.144282 - Training Epoch: 0 Training Iteration: 2450  step_loss : 3.9279303550720215  train_perf : 490.7545471191406 
+
+Epoch: 000, Step:  2500, Loss:  4.00733042, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1593, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2493
+Iteration:  90%|█████████ | 2507/2771 [06:20<00:17, 14.78it/s]DLL 2022-02-14 16:42:50.472615 - Training Epoch: 0 Training Iteration: 2500  step_loss : 4.007330417633057  train_perf : 490.7369689941406 
+
+Epoch: 000, Step:  2550, Loss:  3.83482623, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1643, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2543
+Iteration:  93%|█████████▎| 2583/2771 [06:25<00:12, 14.86it/s]DLL 2022-02-14 16:42:53.798983 - Training Epoch: 0 Training Iteration: 2550  step_loss : 3.8348262310028076  train_perf : 490.7270812988281 
+
+Epoch: 000, Step:  2600, Loss:  3.90873384, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1693, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2593
+DLL 2022-02-14 16:42:57.122942 - Training Epoch: 0 Training Iteration: 2600  step_loss : 3.90873384475708  train_perf : 490.7229919433594 
+
+Epoch: 000, Step:  2650, Loss:  3.91581345, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1743, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2643
+Iteration:  96%|█████████▌| 2659/2771 [06:30<00:07, 14.91it/s]DLL 2022-02-14 16:43:00.450139 - Training Epoch: 0 Training Iteration: 2650  step_loss : 3.915813446044922  train_perf : 490.71099853515625 
+
+Epoch: 000, Step:  2700, Loss:  3.73020220, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1793, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2693
+Iteration:  99%|█████████▊| 2735/2771 [06:35<00:02, 14.95it/s]DLL 2022-02-14 16:43:03.777921 - Training Epoch: 0 Training Iteration: 2700  step_loss : 3.7302021980285645  train_perf : 490.69464111328125 
+
+Epoch: 000, Step:  2750, Loss:  3.85894656, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1843, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2743
+Iteration: 100%|█████████▉| 2770/2771 [06:37<00:00,  6.97it/s]
+Iteration:   0%|          | 0/2771 [00:00<?, ?it/s]DLL 2022-02-14 16:43:07.106408 - Training Epoch: 0 Training Iteration: 2750  step_loss : 3.8589465618133545  train_perf : 490.6759033203125 
+DLL 2022-02-14 16:43:08.374123 -  e2e_train_time : 397.65611243247986  training_sequences_per_second : 490.66552734375  final_loss : 3.991915702819824 
+
+Epoch: 001, Step:     0, Loss:  3.71373820, Perf:  487, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1863, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2763
+DLL 2022-02-14 16:43:09.257957 - Training Epoch: 1 Training Iteration: 0  step_loss : 3.713738203048706  train_perf : 486.544677734375 
+
+Epoch: 001, Step:    50, Loss:  3.69519949, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1913, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2813
+Iteration:   3%|▎         | 71/2771 [00:05<03:10, 14.16it/s]DLL 2022-02-14 16:43:12.585766 - Training Epoch: 1 Training Iteration: 50  step_loss : 3.695199489593506  train_perf : 489.6197814941406 
+
+Epoch: 001, Step:   100, Loss:  3.65816808, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=1963, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2863
+2022-02-14 16:43:18.373866: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:43:18.492151: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:43:18.492169: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:43:18.492175: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:43:18.492177: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:43:18.492178: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:43:18.492180: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:   5%|▌         | 144/2771 [00:10<03:03, 14.28it/s]DLL 2022-02-14 16:43:15.913187 - Training Epoch: 1 Training Iteration: 100  step_loss : 3.658168077468872  train_perf : 489.73138427734375 
+
+Epoch: 001, Step:   150, Loss:  3.69571328, Perf:  487, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=13, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2913
+DLL 2022-02-14 16:43:19.396416 - Training Epoch: 1 Training Iteration: 150  step_loss : 3.6957132816314697  train_perf : 487.3730773925781 
+
+Epoch: 001, Step:   200, Loss:  3.68633318, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=63, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2963
+Iteration:   8%|▊         | 220/2771 [00:15<02:56, 14.49it/s]DLL 2022-02-14 16:43:22.726002 - Training Epoch: 1 Training Iteration: 200  step_loss : 3.686333179473877  train_perf : 487.88873291015625 
+
+Epoch: 001, Step:   250, Loss:  3.60262418, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=113, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3013
+Iteration:  11%|█         | 296/2771 [00:20<02:49, 14.64it/s]DLL 2022-02-14 16:43:26.055053 - Training Epoch: 1 Training Iteration: 250  step_loss : 3.6026241779327393  train_perf : 488.23834228515625 
+
+Epoch: 001, Step:   300, Loss:  3.52804327, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=163, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3063
+DLL 2022-02-14 16:43:29.384934 - Training Epoch: 1 Training Iteration: 300  step_loss : 3.528043270111084  train_perf : 488.4588928222656 
+
+Epoch: 001, Step:   350, Loss:  3.20151639, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=213, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3113
+Iteration:  13%|█▎        | 372/2771 [00:25<02:42, 14.76it/s]DLL 2022-02-14 16:43:32.712070 - Training Epoch: 1 Training Iteration: 350  step_loss : 3.2015163898468018  train_perf : 488.6375427246094 
+
+Epoch: 001, Step:   400, Loss:  3.22817373, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=263, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3163
+Iteration:  16%|█▌        | 448/2771 [00:30<02:36, 14.84it/s]DLL 2022-02-14 16:43:36.039788 - Training Epoch: 1 Training Iteration: 400  step_loss : 3.2281737327575684  train_perf : 488.7702941894531 
+
+Epoch: 001, Step:   450, Loss:  3.19884634, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=313, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3213
+DLL 2022-02-14 16:43:39.367750 - Training Epoch: 1 Training Iteration: 450  step_loss : 3.1988463401794434  train_perf : 488.89300537109375 
+
+Epoch: 001, Step:   500, Loss:  3.43911314, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=363, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3263
+Iteration:  19%|█▉        | 524/2771 [00:35<02:30, 14.90it/s]DLL 2022-02-14 16:43:42.688990 - Training Epoch: 1 Training Iteration: 500  step_loss : 3.439113140106201  train_perf : 489.0718688964844 
+
+Epoch: 001, Step:   550, Loss:  3.36167765, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=413, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3313
+Iteration:  22%|██▏       | 600/2771 [00:40<02:25, 14.94it/s]DLL 2022-02-14 16:43:46.014826 - Training Epoch: 1 Training Iteration: 550  step_loss : 3.361677646636963  train_perf : 489.1493835449219 
+
+Epoch: 001, Step:   600, Loss:  3.17195916, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=463, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3363
+DLL 2022-02-14 16:43:49.344010 - Training Epoch: 1 Training Iteration: 600  step_loss : 3.171959161758423  train_perf : 489.1778869628906 
+
+Epoch: 001, Step:   650, Loss:  3.83706069, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=513, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3413
+Iteration:  24%|██▍       | 676/2771 [00:45<02:20, 14.96it/s]DLL 2022-02-14 16:43:52.671468 - Training Epoch: 1 Training Iteration: 650  step_loss : 3.8370606899261475  train_perf : 489.2353515625 
+
+Epoch: 001, Step:   700, Loss:  3.24609661, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=563, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3463
+DLL 2022-02-14 16:43:56.000904 - Training Epoch: 1 Training Iteration: 700  step_loss : 3.246096611022949  train_perf : 489.264404296875 
+
+Epoch: 001, Step:   750, Loss:  3.46290541, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=613, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3513
+Iteration:  27%|██▋       | 752/2771 [00:50<02:14, 14.98it/s]DLL 2022-02-14 16:43:59.323123 - Training Epoch: 1 Training Iteration: 750  step_loss : 3.4629054069519043  train_perf : 489.35211181640625 
+
+Epoch: 001, Step:   800, Loss:  3.50022197, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=663, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3563
+Iteration:  30%|██▉       | 828/2771 [00:55<02:09, 15.00it/s]DLL 2022-02-14 16:44:02.651668 - Training Epoch: 1 Training Iteration: 800  step_loss : 3.5002219676971436  train_perf : 489.37579345703125 
+
+Epoch: 001, Step:   850, Loss:  3.85044217, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=713, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3613
+DLL 2022-02-14 16:44:05.981954 - Training Epoch: 1 Training Iteration: 850  step_loss : 3.8504421710968018  train_perf : 489.379150390625 
+
+Epoch: 001, Step:   900, Loss:  3.59573364, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=763, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3663
+Iteration:  33%|███▎      | 904/2771 [01:00<02:04, 15.00it/s]DLL 2022-02-14 16:44:09.311867 - Training Epoch: 1 Training Iteration: 900  step_loss : 3.595733642578125  train_perf : 489.37939453125 
+
+Epoch: 001, Step:   950, Loss:  3.83303356, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=813, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3713
+Iteration:  35%|███▌      | 980/2771 [01:05<01:59, 15.00it/s]DLL 2022-02-14 16:44:12.643277 - Training Epoch: 1 Training Iteration: 950  step_loss : 3.833033561706543  train_perf : 489.37469482421875 
+
+Epoch: 001, Step:  1000, Loss:  3.78816891, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=863, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3763
+DLL 2022-02-14 16:44:15.974613 - Training Epoch: 1 Training Iteration: 1000  step_loss : 3.7881689071655273  train_perf : 489.3653259277344 
+
+Epoch: 001, Step:  1050, Loss:  4.07353306, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=256.0, num_good_steps=913, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3813
+Iteration:  38%|███▊      | 1056/2771 [01:10<01:54, 15.01it/s]DLL 2022-02-14 16:44:19.304894 - Training Epoch: 1 Training Iteration: 1050  step_loss : 4.073533058166504  train_perf : 489.3709411621094 
+
+Epoch: 001, Step:  1100, Loss:  4.27552128, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=10, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3862
+Iteration:  41%|████      | 1132/2771 [01:15<01:49, 15.02it/s]DLL 2022-02-14 16:44:22.628266 - Training Epoch: 1 Training Iteration: 1100  step_loss : 4.275521278381348  train_perf : 489.4134216308594 
+
+Epoch: 001, Step:  1150, Loss:  4.35128784, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=60, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3912
+DLL 2022-02-14 16:44:25.953795 - Training Epoch: 1 Training Iteration: 1150  step_loss : 4.351287841796875  train_perf : 489.4446105957031 
+
+Epoch: 001, Step:  1200, Loss:  4.06572819, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=110, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3962
+Iteration:  44%|████▎     | 1208/2771 [01:20<01:44, 15.02it/s]DLL 2022-02-14 16:44:29.282828 - Training Epoch: 1 Training Iteration: 1200  step_loss : 4.065728187561035  train_perf : 489.4574279785156 
+
+Epoch: 001, Step:  1250, Loss:  3.92269516, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=160, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4012
+Iteration:  46%|████▋     | 1284/2771 [01:25<01:39, 15.02it/s]DLL 2022-02-14 16:44:32.615237 - Training Epoch: 1 Training Iteration: 1250  step_loss : 3.9226951599121094  train_perf : 489.4454345703125 
+
+Epoch: 001, Step:  1300, Loss:  3.65251732, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=210, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4062
+DLL 2022-02-14 16:44:35.945113 - Training Epoch: 1 Training Iteration: 1300  step_loss : 3.652517318725586  train_perf : 489.4473571777344 
+
+Epoch: 001, Step:  1350, Loss:  3.56065488, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=260, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4112
+Iteration:  49%|████▉     | 1360/2771 [01:30<01:33, 15.02it/s]DLL 2022-02-14 16:44:39.272062 - Training Epoch: 1 Training Iteration: 1350  step_loss : 3.560654878616333  train_perf : 489.4572448730469 
+
+Epoch: 001, Step:  1400, Loss:  3.76144791, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=310, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4162
+Iteration:  52%|█████▏    | 1436/2771 [01:36<01:28, 15.02it/s]DLL 2022-02-14 16:44:42.600304 - Training Epoch: 1 Training Iteration: 1400  step_loss : 3.7614479064941406  train_perf : 489.4662170410156 
+
+Epoch: 001, Step:  1450, Loss:  3.61381292, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=128.0, num_good_steps=360, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4212
+DLL 2022-02-14 16:44:45.930516 - Training Epoch: 1 Training Iteration: 1450  step_loss : 3.6138129234313965  train_perf : 489.4671630859375 
+
+Epoch: 001, Step:  1500, Loss:  4.14235973, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=27, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4261
+Iteration:  55%|█████▍    | 1512/2771 [01:41<01:23, 15.03it/s]DLL 2022-02-14 16:44:49.253496 - Training Epoch: 1 Training Iteration: 1500  step_loss : 4.142359733581543  train_perf : 489.5029602050781 
+
+Epoch: 001, Step:  1550, Loss:  3.82415986, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=77, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4311
+Iteration:  57%|█████▋    | 1588/2771 [01:46<01:18, 15.02it/s]DLL 2022-02-14 16:44:52.584441 - Training Epoch: 1 Training Iteration: 1550  step_loss : 3.824159860610962  train_perf : 489.4957580566406 
+
+Epoch: 001, Step:  1600, Loss:  3.46909404, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=127, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4361
+DLL 2022-02-14 16:44:55.913739 - Training Epoch: 1 Training Iteration: 1600  step_loss : 3.4690940380096436  train_perf : 489.4958190917969 
+
+Epoch: 001, Step:  1650, Loss:  3.85869884, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=177, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4411
+Iteration:  60%|██████    | 1664/2771 [01:51<01:13, 15.02it/s]DLL 2022-02-14 16:44:59.243637 - Training Epoch: 1 Training Iteration: 1650  step_loss : 3.858698844909668  train_perf : 489.4961853027344 
+
+Epoch: 001, Step:  1700, Loss:  3.83789635, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=227, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4461
+Iteration:  63%|██████▎   | 1740/2771 [01:56<01:08, 15.02it/s]DLL 2022-02-14 16:45:02.574503 - Training Epoch: 1 Training Iteration: 1700  step_loss : 3.8378963470458984  train_perf : 489.491943359375 
+
+Epoch: 001, Step:  1750, Loss:  3.72824287, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=277, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4511
+DLL 2022-02-14 16:45:05.903292 - Training Epoch: 1 Training Iteration: 1750  step_loss : 3.728242874145508  train_perf : 489.4923400878906 
+
+Epoch: 001, Step:  1800, Loss:  3.89279819, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=327, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4561
+Iteration:  66%|██████▌   | 1816/2771 [02:01<01:03, 15.02it/s]DLL 2022-02-14 16:45:09.228888 - Training Epoch: 1 Training Iteration: 1800  step_loss : 3.8927981853485107  train_perf : 489.5066833496094 
+
+Epoch: 001, Step:  1850, Loss:  3.83803034, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=377, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4611
+Iteration:  68%|██████▊   | 1892/2771 [02:06<00:58, 15.02it/s]DLL 2022-02-14 16:45:12.552259 - Training Epoch: 1 Training Iteration: 1850  step_loss : 3.8380303382873535  train_perf : 489.52569580078125 
+
+Epoch: 001, Step:  1900, Loss:  3.64755440, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=427, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4661
+DLL 2022-02-14 16:45:15.882006 - Training Epoch: 1 Training Iteration: 1900  step_loss : 3.647554397583008  train_perf : 489.5213317871094 
+
+Epoch: 001, Step:  1950, Loss:  3.69615221, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=477, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4711
+Iteration:  71%|███████   | 1968/2771 [02:11<00:53, 15.02it/s]DLL 2022-02-14 16:45:19.206406 - Training Epoch: 1 Training Iteration: 1950  step_loss : 3.6961522102355957  train_perf : 489.53973388671875 
+
+Epoch: 001, Step:  2000, Loss:  3.97005224, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=527, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4761
+Iteration:  74%|███████▍  | 2044/2771 [02:16<00:48, 15.03it/s]DLL 2022-02-14 16:45:22.534356 - Training Epoch: 1 Training Iteration: 2000  step_loss : 3.9700522422790527  train_perf : 489.5420227050781 
+
+Epoch: 001, Step:  2050, Loss:  3.58531570, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=577, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4811
+DLL 2022-02-14 16:45:25.861535 - Training Epoch: 1 Training Iteration: 2050  step_loss : 3.585315704345703  train_perf : 489.54534912109375 
+
+Epoch: 001, Step:  2100, Loss:  3.87219453, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=627, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4861
+Iteration:  77%|███████▋  | 2120/2771 [02:21<00:43, 15.03it/s]DLL 2022-02-14 16:45:29.191564 - Training Epoch: 1 Training Iteration: 2100  step_loss : 3.872194528579712  train_perf : 489.5422058105469 
+
+Epoch: 001, Step:  2150, Loss:  3.76190305, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=677, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4911
+Iteration:  79%|███████▉  | 2196/2771 [02:26<00:38, 15.03it/s]DLL 2022-02-14 16:45:32.515125 - Training Epoch: 1 Training Iteration: 2150  step_loss : 3.7619030475616455  train_perf : 489.5566101074219 
+
+Epoch: 001, Step:  2200, Loss:  3.64215422, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=727, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4961
+DLL 2022-02-14 16:45:35.844968 - Training Epoch: 1 Training Iteration: 2200  step_loss : 3.6421542167663574  train_perf : 489.5540771484375 
+
+Epoch: 001, Step:  2250, Loss:  3.76868415, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=777, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5011
+Iteration:  82%|████████▏ | 2272/2771 [02:31<00:33, 15.02it/s]DLL 2022-02-14 16:45:39.179433 - Training Epoch: 1 Training Iteration: 2250  step_loss : 3.768684148788452  train_perf : 489.5395812988281 
+
+Epoch: 001, Step:  2300, Loss:  3.64426923, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=827, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5061
+Iteration:  85%|████████▍ | 2348/2771 [02:36<00:28, 15.01it/s]DLL 2022-02-14 16:45:42.510763 - Training Epoch: 1 Training Iteration: 2300  step_loss : 3.6442692279815674  train_perf : 489.53912353515625 
+
+Epoch: 001, Step:  2350, Loss:  3.47589278, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=877, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5111
+DLL 2022-02-14 16:45:45.843753 - Training Epoch: 1 Training Iteration: 2350  step_loss : 3.4758927822113037  train_perf : 489.528076171875 
+
+Epoch: 001, Step:  2400, Loss:  3.56060147, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=927, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5161
+Iteration:  87%|████████▋ | 2424/2771 [02:41<00:23, 15.01it/s]DLL 2022-02-14 16:45:49.170950 - Training Epoch: 1 Training Iteration: 2400  step_loss : 3.5606014728546143  train_perf : 489.5287780761719 
+
+Epoch: 001, Step:  2450, Loss:  3.78769445, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=977, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5211
+Iteration:  90%|█████████ | 2500/2771 [02:46<00:18, 15.01it/s]DLL 2022-02-14 16:45:52.504221 - Training Epoch: 1 Training Iteration: 2450  step_loss : 3.7876944541931152  train_perf : 489.5177917480469 
+
+Epoch: 001, Step:  2500, Loss:  3.95680094, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1027, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5261
+DLL 2022-02-14 16:45:55.834795 - Training Epoch: 1 Training Iteration: 2500  step_loss : 3.956800937652588  train_perf : 489.5175476074219 
+
+Epoch: 001, Step:  2550, Loss:  3.80009890, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1077, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5311
+Iteration:  93%|█████████▎| 2576/2771 [02:51<00:12, 15.02it/s]DLL 2022-02-14 16:45:59.164720 - Training Epoch: 1 Training Iteration: 2550  step_loss : 3.8000988960266113  train_perf : 489.510986328125 
+
+Epoch: 001, Step:  2600, Loss:  3.81634307, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1127, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5361
+DLL 2022-02-14 16:46:02.491873 - Training Epoch: 1 Training Iteration: 2600  step_loss : 3.816343069076538  train_perf : 489.51531982421875 
+
+Epoch: 001, Step:  2650, Loss:  3.70184994, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1177, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5411
+Iteration:  96%|█████████▌| 2652/2771 [02:56<00:07, 15.02it/s]DLL 2022-02-14 16:46:05.816069 - Training Epoch: 1 Training Iteration: 2650  step_loss : 3.701849937438965  train_perf : 489.5256652832031 
+
+Epoch: 001, Step:  2700, Loss:  4.02040434, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1227, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5461
+Iteration:  98%|█████████▊| 2728/2771 [03:02<00:02, 15.02it/s]DLL 2022-02-14 16:46:09.143223 - Training Epoch: 1 Training Iteration: 2700  step_loss : 4.02040433883667  train_perf : 489.53106689453125 
+
+Epoch: 001, Step:  2750, Loss:  3.64751792, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=64.0, num_good_steps=1277, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5511
+Iteration: 100%|█████████▉| 2770/2771 [03:04<00:00, 14.99it/s]DLL 2022-02-14 16:46:12.474608 - Training Epoch: 1 Training Iteration: 2750  step_loss : 3.6475179195404053  train_perf : 489.52276611328125 
+DLL 2022-02-14 16:46:13.738551 -  e2e_train_time : 582.4906694889069  training_sequences_per_second : 489.5248718261719  final_loss : 3.708162546157837 
+***** Running evaluation *****
+  Num Batches =  22
+  Batch size =  512
+
+Iteration:   0%|          | 0/22 [00:00<?, ?it/s]2022-02-14 16:46:15.196590: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 16:47:41.280325: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:47:42.328857: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:47:42.328876: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:47:42.328883: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:47:42.328885: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:47:42.328887: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:47:42.328889: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:   5%|▍         | 1/22 [01:31<31:58, 91.37s/it]Iteration:  14%|█▎        | 3/22 [01:37<20:31, 64.82s/it]Iteration:  23%|██▎       | 5/22 [01:42<13:06, 46.24s/it]Iteration:  32%|███▏      | 7/22 [01:48<08:19, 33.27s/it]Iteration:  41%|████      | 9/22 [01:55<05:14, 24.21s/it]Iteration:  50%|█████     | 11/22 [02:01<03:16, 17.88s/it]Iteration:  59%|█████▉    | 13/22 [02:07<02:01, 13.46s/it]Iteration:  68%|██████▊   | 15/22 [02:13<01:12, 10.38s/it]Iteration:  77%|███████▋  | 17/22 [02:20<00:41,  8.25s/it]Iteration:  86%|████████▋ | 19/22 [02:27<00:20,  6.77s/it]Iteration:  95%|█████████▌| 21/22 [02:33<00:05,  5.74s/it]2022-02-14 16:48:48.712349: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+Iteration:  95%|█████████▌| 21/22 [02:50<00:05,  5.74s/it]2022-02-14 16:50:00.682243: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:50:01.741398: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:50:01.741418: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:50:01.741424: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:50:01.741426: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:50:01.741428: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:50:01.741430: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration: 100%|██████████| 22/22 [03:48<00:00, 26.42s/it]Iteration: 100%|██████████| 22/22 [03:48<00:00, 10.39s/it]{"exact_match": 2.336802270577105, "f1": 4.941414472717352}
+
+Epoch: 001 Results: {"exact_match": 2.336802270577105, "f1": 4.941414472717352}
+
+**EVAL SUMMARY** - Epoch: 001,  EM:  2.337, F1:  4.941, Infer_Perf: 1049 seq/s
+**LATENCY SUMMARY** - Epoch: 001,  Ave: 443.775 ms, 90%: 443.279 ms, 95%: 443.532 ms, 99%: 443.532 ms
+DLL 2022-02-14 16:50:17.389315 -  inference_sequences_per_second : 1049.4730224609375  e2e_inference_time : 241.21820330619812 
+**RESULTS SUMMARY** - EM:  2.337, F1:  4.941, Train_Time:  582 s, Train_Perf:  490 seq/s, Infer_Perf: 1049 seq/s
+
+DLL 2022-02-14 16:50:17.390138 -  exact_match : 2.336802270577105  F1 : 4.941414472717352 
+====================================  END test_results/models/base/checkpoints/ckpt-3000  ====================================
+==================================== START test_results/models/base/checkpoints/ckpt-5 ====================================
+Compute dtype: float16
+Variable dtype: float32
+ ** Restored from test_results/models/base/checkpoints/ckpt-5 at step 5
+================================================================================
+ ** Saving discriminator
+================================================================================
+Configuration saved in test_results/models/base/checkpoints/discriminator/config.json
+Model weights saved in test_results/models/base/checkpoints/discriminator/tf_model.h5: {'electra', 'discriminator_predictions'}
+Container nvidia build =  14714731
+out dir is test_results/
+mixed-precision training and xla activated!
+Running SQuAD-v1.1
+   python run_tf_squad.py --init_checkpoint=checkpoints/electra_base_qa_v2_False_epoch_2_ckpt  --do_train  --train_batch_size=32 --do_predict --predict_batch_size=512 --eval_script=/workspace/electra/data/download/squad/v1.1/evaluate-v1.1.py --do_eval    --data_dir /workspace/electra/data/download/squad/v1.1  --do_lower_case  --electra_model=test_results/models/base/checkpoints/discriminator  --learning_rate=8e-4  --warmup_proportion 0.05  --weight_decay_rate 0.01  --layerwise_lr_decay 0.8  --seed=1  --num_train_epochs=2  --max_seq_length=384  --doc_stride=128  --beam_size 5  --joint_head True  --null_score_diff_threshold -5.6  --output_dir=test_results/   --amp --xla  --cache_dir=/workspace/electra/data/download/squad/v1.1  --max_steps=-1  --vocab_file=/workspace/electra/vocab/vocab.txt  |& tee test_results//logfile.txt
+2022-02-14 16:50:23.474849: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+Running total processes: 1
+Starting process: 0
+2022-02-14 16:50:24.318859: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcuda.so.1
+2022-02-14 16:50:24.334875: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.335301: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.74GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-02-14 16:50:24.335316: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:50:24.336682: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+2022-02-14 16:50:24.337247: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
+2022-02-14 16:50:24.337384: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
+2022-02-14 16:50:24.338843: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
+2022-02-14 16:50:24.339164: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.11
+2022-02-14 16:50:24.339243: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:50:24.339286: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.339739: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.340130: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2022-02-14 16:50:24.345145: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 3600000000 Hz
+2022-02-14 16:50:24.345557: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7f2b80000b20 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2022-02-14 16:50:24.345567: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2022-02-14 16:50:24.485693: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.486212: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7f2a9c000b20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2022-02-14 16:50:24.486225: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce RTX 3090, Compute Capability 8.6
+2022-02-14 16:50:24.486339: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.486764: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.74GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-02-14 16:50:24.486781: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:50:24.486807: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+2022-02-14 16:50:24.486818: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcufft.so.10
+2022-02-14 16:50:24.486829: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcurand.so.10
+2022-02-14 16:50:24.486839: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusolver.so.10
+2022-02-14 16:50:24.486849: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcusparse.so.11
+2022-02-14 16:50:24.486859: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:50:24.486890: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.487333: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.487734: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2022-02-14 16:50:24.487750: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.11.0
+2022-02-14 16:50:24.652938: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2022-02-14 16:50:24.652964: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 
+2022-02-14 16:50:24.652969: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N 
+2022-02-14 16:50:24.653084: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.653563: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:981] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-02-14 16:50:24.653976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 22444 MB memory) -> physical GPU (device: 0, name: GeForce RTX 3090, pci bus id: 0000:01:00.0, compute capability: 8.6)
+DLL 2022-02-14 16:50:24.318156 - PARAMETER SEED : 1 
+Compute dtype: float16
+Variable dtype: float32
+***** Loading tokenizer and model *****
+model: test_results/models/base/checkpoints/discriminator
+loading configuration file test_results/models/base/checkpoints/discriminator/config.json
+loading weights file test_results/models/base/checkpoints/discriminator/tf_model.h5
+2022-02-14 16:50:24.722451: W tensorflow/python/util/util.cc:329] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
+2022-02-14 16:50:24.761772: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcublas.so.11
+WARNING:tensorflow:Layer activation_2 is casting an input tensor from dtype float16 to the layer's dtype of float32, which is new behavior in TensorFlow 2.  The layer has dtype float32 because it's dtype defaults to floatx.
+
+If you intended to run this layer in float32, you can safely ignore this warning. If in doubt, this warning is likely only an issue if you are porting a TensorFlow 1.X model to TensorFlow 2.
+
+To change all layers to have dtype float16 by default, call `tf.keras.backend.set_floatx('float16')`. To change just this layer, pass dtype='float16' to the layer constructor. If you are the author of this layer, you can disable autocasting by passing autocast=False to the base Layer constructor.
+
+Some weights of the model checkpoint at test_results/models/base/checkpoints/discriminator were not used when initializing TFElectraForQuestionAnswering: ['discriminator_predictions']
+
+Some weights of TFElectraForQuestionAnswering were not initialized from the model checkpoint at test_results/models/base/checkpoints/discriminator and are newly initialized: ['end_logits', 'start_logits']
+
+weights loaded
+***** Loading dataset *****
+  0%|          | 0/442 [00:00<?, ?it/s] 37%|███▋      | 165/442 [00:05<00:08, 32.85it/s] 69%|██████▉   | 304/442 [00:10<00:04, 31.15it/s]100%|██████████| 442/442 [00:14<00:00, 29.48it/s]
+  0%|          | 0/48 [00:00<?, ?it/s]100%|██████████| 48/48 [00:01<00:00, 27.30it/s]***** Loading features *****
+***** Running training *****
+  Num examples =  88641
+  Num Epochs =  2
+  Instantaneous batch size per GPU =  32
+  Total train batch size (w. parallel, distributed & accumulation) =  32
+  Total optimization steps = 5541
+
+Iteration:   0%|          | 0/2771 [00:00<?, ?it/s]2022-02-14 16:51:21.527106: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1631] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+2022-02-14 16:51:22.402374: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 16:51:22.428424: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudnn.so.8
+2022-02-14 16:51:23.037924: W tensorflow/stream_executor/gpu/redzone_allocator.cc:314] Internal: ptxas exited with non-zero error code 65280, output: ptxas fatal   : Value 'sm_86' is not defined for option 'gpu-name'
+
+Relying on driver to perform ptx compilation. 
+Modify $PATH to customize ptxas location.
+This message will be only logged once.
+2022-02-14 16:51:23.321891: W tensorflow/compiler/xla/service/gpu/buffer_comparator.cc:592] Internal: ptxas exited with non-zero error code 65280, output: ptxas fatal   : Value 'sm_86' is not defined for option 'gpu-name'
+
+Relying on driver to perform ptx compilation. 
+Setting XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda  or modifying $PATH can be used to set the location of ptxas
+This message will only be logged once.
+2022-02-14 16:54:33.865213: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:37.147011: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:37.147030: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:37.147037: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:37.147039: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:37.147040: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:37.147042: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:54:37.161264: I tensorflow/compiler/jit/xla_compilation_cache.cc:241] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2022-02-14 16:54:39.143733: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:39.286691: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:39.286725: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:39.286733: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:39.286736: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:39.286739: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:39.286743: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:54:39.346212: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:39.531782: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:39.531804: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:39.531811: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:39.531814: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:39.531815: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:39.531817: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:54:39.750004: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:40.518230: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:40.518265: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:40.518272: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:40.518274: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:40.518276: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:40.518278: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+
+Epoch: 000, Step:     0, Loss:  5.27780342, Perf:    0, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1
+/usr/local/lib/python3.6/dist-packages/tensorflow/python/framework/indexed_slices.py:434: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+Iteration:   0%|          | 1/2771 [03:27<159:50:28, 207.74s/it]2022-02-14 16:54:43.593615: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 16:54:44.910878: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:48.176495: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:48.176513: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:48.176519: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:48.176521: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:48.176523: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:48.176525: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+2022-02-14 16:54:50.109674: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:50.196415: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:50.484471: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:51.496098: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:54:51.617965: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:54:51.618015: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:54:51.618037: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:54:51.618039: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:54:51.618041: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:54:51.618044: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:   0%|          | 2/2771 [03:38<114:19:00, 148.62s/it]DLL 2022-02-14 16:54:40.957109 - Training Epoch: 0 Training Iteration: 0  step_loss : 5.277803421020508  train_perf : 0.1542586386203766 
+
+Epoch: 000, Step:    50, Loss:  5.06274891, Perf:  468, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=51, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:51
+Iteration:   3%|▎         | 77/2771 [03:43<77:52:09, 104.06s/it]DLL 2022-02-14 16:54:54.940443 - Training Epoch: 0 Training Iteration: 50  step_loss : 5.062748908996582  train_perf : 467.88897705078125 
+
+Epoch: 000, Step:   100, Loss:  4.21491957, Perf:  479, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=101, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:101
+DLL 2022-02-14 16:54:58.264635 - Training Epoch: 0 Training Iteration: 100  step_loss : 4.214919567108154  train_perf : 479.1407470703125 
+
+Epoch: 000, Step:   150, Loss:  3.57227898, Perf:  484, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=151, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:151
+Iteration:   6%|▌         | 153/2771 [03:48<52:59:07, 72.86s/it]DLL 2022-02-14 16:55:01.573699 - Training Epoch: 0 Training Iteration: 150  step_loss : 3.5722789764404297  train_perf : 483.718505859375 
+
+Epoch: 000, Step:   200, Loss:  3.70887351, Perf:  486, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=201, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:201
+Iteration:   8%|▊         | 229/2771 [03:53<36:01:37, 51.02s/it]DLL 2022-02-14 16:55:04.874474 - Training Epoch: 0 Training Iteration: 200  step_loss : 3.7088735103607178  train_perf : 486.2010498046875 
+
+Epoch: 000, Step:   250, Loss:  3.28653097, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=251, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:251
+2022-02-14 16:55:09.937902: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:55:10.054199: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:55:10.054217: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:55:10.054240: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:55:10.054242: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:55:10.054244: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:55:10.054261: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+DLL 2022-02-14 16:55:08.159098 - Training Epoch: 0 Training Iteration: 250  step_loss : 3.2865309715270996  train_perf : 488.2743225097656 
+
+Epoch: 000, Step:   300, Loss:  3.20113611, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=301, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:301
+Iteration:  11%|█         | 303/2771 [03:58<24:29:55, 35.74s/it]DLL 2022-02-14 16:55:11.614674 - Training Epoch: 0 Training Iteration: 300  step_loss : 3.2011361122131348  train_perf : 487.9896240234375 
+
+Epoch: 000, Step:   350, Loss:  2.98300338, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=351, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:351
+Iteration:  14%|█▎        | 379/2771 [04:03<16:38:03, 25.03s/it]DLL 2022-02-14 16:55:14.907217 - Training Epoch: 0 Training Iteration: 350  step_loss : 2.9830033779144287  train_perf : 489.0450134277344 
+
+Epoch: 000, Step:   400, Loss:  3.33493137, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=401, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:401
+DLL 2022-02-14 16:55:18.225799 - Training Epoch: 0 Training Iteration: 400  step_loss : 3.3349313735961914  train_perf : 489.3550109863281 
+
+Epoch: 000, Step:   450, Loss:  2.58203983, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=451, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:451
+Iteration:  16%|█▋        | 455/2771 [04:08<11:17:12, 17.54s/it]DLL 2022-02-14 16:55:21.536511 - Training Epoch: 0 Training Iteration: 450  step_loss : 2.5820398330688477  train_perf : 489.712890625 
+
+Epoch: 000, Step:   500, Loss:  3.07192326, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=501, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:501
+Iteration:  19%|█▉        | 531/2771 [04:13<7:39:13, 12.30s/it] DLL 2022-02-14 16:55:24.845760 - Training Epoch: 0 Training Iteration: 500  step_loss : 3.07192325592041  train_perf : 489.9981384277344 
+
+Epoch: 000, Step:   550, Loss:  3.04485464, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=551, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:551
+DLL 2022-02-14 16:55:28.158517 - Training Epoch: 0 Training Iteration: 550  step_loss : 3.0448546409606934  train_perf : 490.1941223144531 
+
+Epoch: 000, Step:   600, Loss:  2.88445234, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=601, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:601
+Iteration:  22%|██▏       | 607/2771 [04:18<5:11:16,  8.63s/it]DLL 2022-02-14 16:55:31.482410 - Training Epoch: 0 Training Iteration: 600  step_loss : 2.8844523429870605  train_perf : 490.25311279296875 
+
+Epoch: 000, Step:   650, Loss:  3.09431815, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=651, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:651
+Iteration:  25%|██▍       | 683/2771 [04:23<3:30:55,  6.06s/it]DLL 2022-02-14 16:55:34.795688 - Training Epoch: 0 Training Iteration: 650  step_loss : 3.094318151473999  train_perf : 490.3857116699219 
+
+Epoch: 000, Step:   700, Loss:  2.90720177, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=701, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:701
+DLL 2022-02-14 16:55:38.111106 - Training Epoch: 0 Training Iteration: 700  step_loss : 2.9072017669677734  train_perf : 490.4775695800781 
+
+Epoch: 000, Step:   750, Loss:  2.84256315, Perf:  491, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=751, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:751
+Iteration:  27%|██▋       | 759/2771 [04:28<2:22:56,  4.26s/it]DLL 2022-02-14 16:55:41.432997 - Training Epoch: 0 Training Iteration: 750  step_loss : 2.8425631523132324  train_perf : 490.50396728515625 
+
+Epoch: 000, Step:   800, Loss:  2.90449643, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=801, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:801
+Iteration:  30%|███       | 834/2771 [04:33<1:36:58,  3.00s/it]DLL 2022-02-14 16:55:44.768698 - Training Epoch: 0 Training Iteration: 800  step_loss : 2.904496431350708  train_perf : 490.39825439453125 
+
+Epoch: 000, Step:   850, Loss:  3.54981661, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=851, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:851
+DLL 2022-02-14 16:55:48.099651 - Training Epoch: 0 Training Iteration: 850  step_loss : 3.549816608428955  train_perf : 490.3403625488281 
+
+Epoch: 000, Step:   900, Loss:  2.41229534, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=901, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:901
+Iteration:  33%|███▎      | 910/2771 [04:38<1:05:50,  2.12s/it]DLL 2022-02-14 16:55:51.433768 - Training Epoch: 0 Training Iteration: 900  step_loss : 2.412295341491699  train_perf : 490.2708435058594 
+
+Epoch: 000, Step:   950, Loss:  3.45730686, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=951, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:951
+Iteration:  36%|███▌      | 986/2771 [04:43<44:48,  1.51s/it]  DLL 2022-02-14 16:55:54.767457 - Training Epoch: 0 Training Iteration: 950  step_loss : 3.4573068618774414  train_perf : 490.20404052734375 
+
+Epoch: 000, Step:  1000, Loss:  3.05464864, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1001, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1001
+DLL 2022-02-14 16:55:58.097495 - Training Epoch: 0 Training Iteration: 1000  step_loss : 3.0546486377716064  train_perf : 490.1567687988281 
+
+Epoch: 000, Step:  1050, Loss:  3.15767574, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1051, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1051
+Iteration:  38%|███▊      | 1061/2771 [04:48<30:36,  1.07s/it]DLL 2022-02-14 16:56:01.430658 - Training Epoch: 0 Training Iteration: 1050  step_loss : 3.1576757431030273  train_perf : 490.0980224609375 
+
+Epoch: 000, Step:  1100, Loss:  3.44475651, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1101, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1101
+Iteration:  41%|████      | 1136/2771 [04:53<21:02,  1.30it/s]DLL 2022-02-14 16:56:04.764921 - Training Epoch: 0 Training Iteration: 1100  step_loss : 3.444756507873535  train_perf : 490.0466613769531 
+
+Epoch: 000, Step:  1150, Loss:  3.59657001, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1151, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1151
+DLL 2022-02-14 16:56:08.102654 - Training Epoch: 0 Training Iteration: 1150  step_loss : 3.5965700149536133  train_perf : 489.9787292480469 
+
+Epoch: 000, Step:  1200, Loss:  2.99746871, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1201, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1201
+Iteration:  44%|████▎     | 1211/2771 [04:58<14:34,  1.78it/s]DLL 2022-02-14 16:56:11.437778 - Training Epoch: 0 Training Iteration: 1200  step_loss : 2.9974687099456787  train_perf : 489.92822265625 
+
+Epoch: 000, Step:  1250, Loss:  3.53391290, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1251, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1251
+Iteration:  46%|████▋     | 1286/2771 [05:03<10:12,  2.43it/s]DLL 2022-02-14 16:56:14.772514 - Training Epoch: 0 Training Iteration: 1250  step_loss : 3.5339128971099854  train_perf : 489.8825378417969 
+
+Epoch: 000, Step:  1300, Loss:  3.26012278, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1301, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1301
+DLL 2022-02-14 16:56:18.110239 - Training Epoch: 0 Training Iteration: 1300  step_loss : 3.260122776031494  train_perf : 489.83551025390625 
+
+Epoch: 000, Step:  1350, Loss:  3.03385520, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1351, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1351
+Iteration:  49%|████▉     | 1361/2771 [05:08<07:15,  3.24it/s]DLL 2022-02-14 16:56:21.444538 - Training Epoch: 0 Training Iteration: 1350  step_loss : 3.0338551998138428  train_perf : 489.8100891113281 
+
+Epoch: 000, Step:  1400, Loss:  3.13176584, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1401, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1401
+Iteration:  52%|█████▏    | 1436/2771 [05:13<05:15,  4.24it/s]DLL 2022-02-14 16:56:24.783379 - Training Epoch: 0 Training Iteration: 1400  step_loss : 3.131765842437744  train_perf : 489.76007080078125 
+
+Epoch: 000, Step:  1450, Loss:  2.99928474, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1451, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1451
+DLL 2022-02-14 16:56:28.117868 - Training Epoch: 0 Training Iteration: 1450  step_loss : 2.9992847442626953  train_perf : 489.7336730957031 
+
+Epoch: 000, Step:  1500, Loss:  3.60364676, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1501, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1501
+Iteration:  55%|█████▍    | 1511/2771 [05:18<03:53,  5.40it/s]DLL 2022-02-14 16:56:31.460907 - Training Epoch: 0 Training Iteration: 1500  step_loss : 3.603646755218506  train_perf : 489.6634826660156 
+
+Epoch: 000, Step:  1550, Loss:  3.13748693, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1551, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1551
+Iteration:  57%|█████▋    | 1586/2771 [05:23<02:57,  6.68it/s]DLL 2022-02-14 16:56:34.796199 - Training Epoch: 0 Training Iteration: 1550  step_loss : 3.1374869346618652  train_perf : 489.6297607421875 
+
+Epoch: 000, Step:  1600, Loss:  3.10867810, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1601, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1601
+DLL 2022-02-14 16:56:38.131135 - Training Epoch: 0 Training Iteration: 1600  step_loss : 3.108678102493286  train_perf : 489.5960388183594 
+
+Epoch: 000, Step:  1650, Loss:  3.36137104, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1651, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1651
+Iteration:  60%|█████▉    | 1661/2771 [05:28<02:18,  8.01it/s]DLL 2022-02-14 16:56:41.464769 - Training Epoch: 0 Training Iteration: 1650  step_loss : 3.3613710403442383  train_perf : 489.5726013183594 
+
+Epoch: 000, Step:  1700, Loss:  2.93660307, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1701, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1701
+Iteration:  63%|██████▎   | 1737/2771 [05:33<01:51,  9.31it/s]DLL 2022-02-14 16:56:44.801888 - Training Epoch: 0 Training Iteration: 1700  step_loss : 2.93660306930542  train_perf : 489.5412902832031 
+
+Epoch: 000, Step:  1750, Loss:  3.24072361, Perf:  490, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1751, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1751
+DLL 2022-02-14 16:56:48.136493 - Training Epoch: 0 Training Iteration: 1750  step_loss : 3.2407236099243164  train_perf : 489.5194091796875 
+
+Epoch: 000, Step:  1800, Loss:  2.98115516, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1801, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1801
+Iteration:  65%|██████▌   | 1812/2771 [05:38<01:31, 10.51it/s]DLL 2022-02-14 16:56:51.470999 - Training Epoch: 0 Training Iteration: 1800  step_loss : 2.9811551570892334  train_perf : 489.49566650390625 
+
+Epoch: 000, Step:  1850, Loss:  2.82942367, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1851, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1851
+Iteration:  68%|██████▊   | 1888/2771 [05:44<01:16, 11.54it/s]DLL 2022-02-14 16:56:54.806749 - Training Epoch: 0 Training Iteration: 1850  step_loss : 2.829423666000366  train_perf : 489.4720764160156 
+
+Epoch: 000, Step:  1900, Loss:  2.82961345, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1901, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1901
+DLL 2022-02-14 16:56:58.138940 - Training Epoch: 0 Training Iteration: 1900  step_loss : 2.829613447189331  train_perf : 489.4655456542969 
+
+Epoch: 000, Step:  1950, Loss:  2.79585934, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1951, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:1951
+Iteration:  71%|███████   | 1964/2771 [05:49<01:05, 12.40it/s]2022-02-14 16:57:04.733032: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:57:04.851865: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:57:04.851883: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:57:04.851905: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:57:04.851907: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:57:04.851909: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:57:04.851925: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+DLL 2022-02-14 16:57:01.469031 - Training Epoch: 0 Training Iteration: 1950  step_loss : 2.7958593368530273  train_perf : 489.4650573730469 
+
+Epoch: 000, Step:  2000, Loss:  3.22939682, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=65536.0, num_good_steps=1, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2001
+2022-02-14 16:57:05.018075: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 16:57:05.146919: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 16:57:05.146938: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 16:57:05.146960: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 16:57:05.146962: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 16:57:05.146964: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 16:57:05.146982: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:  74%|███████▎  | 2039/2771 [05:54<00:56, 12.87it/s]DLL 2022-02-14 16:57:04.953393 - Training Epoch: 0 Training Iteration: 2000  step_loss : 3.2293968200683594  train_perf : 489.2880859375 
+
+Epoch: 000, Step:  2050, Loss:  3.05809379, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=49, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2050
+DLL 2022-02-14 16:57:08.449635 - Training Epoch: 0 Training Iteration: 2050  step_loss : 3.058093786239624  train_perf : 489.1050109863281 
+
+Epoch: 000, Step:  2100, Loss:  3.18367863, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=99, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2100
+Iteration:  76%|███████▋  | 2114/2771 [05:59<00:48, 13.44it/s]DLL 2022-02-14 16:57:11.792494 - Training Epoch: 0 Training Iteration: 2100  step_loss : 3.18367862701416  train_perf : 489.0745544433594 
+
+Epoch: 000, Step:  2150, Loss:  3.03319812, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=149, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2150
+Iteration:  79%|███████▉  | 2189/2771 [06:04<00:41, 13.86it/s]DLL 2022-02-14 16:57:15.129726 - Training Epoch: 0 Training Iteration: 2150  step_loss : 3.033198118209839  train_perf : 489.0611267089844 
+
+Epoch: 000, Step:  2200, Loss:  3.07746768, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=199, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2200
+DLL 2022-02-14 16:57:18.471338 - Training Epoch: 0 Training Iteration: 2200  step_loss : 3.077467679977417  train_perf : 489.03289794921875 
+
+Epoch: 000, Step:  2250, Loss:  2.83902955, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=249, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2250
+Iteration:  82%|████████▏ | 2264/2771 [06:09<00:35, 14.18it/s]DLL 2022-02-14 16:57:21.808604 - Training Epoch: 0 Training Iteration: 2250  step_loss : 2.839029550552368  train_perf : 489.02044677734375 
+
+Epoch: 000, Step:  2300, Loss:  3.10633850, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=299, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2300
+Iteration:  84%|████████▍ | 2339/2771 [06:14<00:29, 14.41it/s]DLL 2022-02-14 16:57:25.141983 - Training Epoch: 0 Training Iteration: 2300  step_loss : 3.1063385009765625  train_perf : 489.0181579589844 
+
+Epoch: 000, Step:  2350, Loss:  2.64301610, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=349, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2350
+DLL 2022-02-14 16:57:28.477522 - Training Epoch: 0 Training Iteration: 2350  step_loss : 2.6430160999298096  train_perf : 489.0086669921875 
+
+Epoch: 000, Step:  2400, Loss:  2.81125283, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=399, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2400
+Iteration:  87%|████████▋ | 2414/2771 [06:19<00:24, 14.58it/s]DLL 2022-02-14 16:57:31.811786 - Training Epoch: 0 Training Iteration: 2400  step_loss : 2.8112528324127197  train_perf : 489.00042724609375 
+
+Epoch: 000, Step:  2450, Loss:  3.34467220, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=449, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2450
+Iteration:  90%|████████▉ | 2489/2771 [06:24<00:19, 14.70it/s]DLL 2022-02-14 16:57:35.149720 - Training Epoch: 0 Training Iteration: 2450  step_loss : 3.344672203063965  train_perf : 488.9834899902344 
+
+Epoch: 000, Step:  2500, Loss:  3.23175740, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=499, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2500
+DLL 2022-02-14 16:57:38.489572 - Training Epoch: 0 Training Iteration: 2500  step_loss : 3.231757402420044  train_perf : 488.96417236328125 
+
+Epoch: 000, Step:  2550, Loss:  2.86793375, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=549, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2550
+Iteration:  93%|█████████▎| 2564/2771 [06:29<00:14, 14.78it/s]DLL 2022-02-14 16:57:41.831739 - Training Epoch: 0 Training Iteration: 2550  step_loss : 2.867933750152588  train_perf : 488.9427795410156 
+
+Epoch: 000, Step:  2600, Loss:  3.01960349, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=599, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2600
+Iteration:  95%|█████████▌| 2639/2771 [06:34<00:08, 14.84it/s]DLL 2022-02-14 16:57:45.171183 - Training Epoch: 0 Training Iteration: 2600  step_loss : 3.0196034908294678  train_perf : 488.92266845703125 
+
+Epoch: 000, Step:  2650, Loss:  3.10210180, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=649, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2650
+DLL 2022-02-14 16:57:48.509499 - Training Epoch: 0 Training Iteration: 2650  step_loss : 3.1021018028259277  train_perf : 488.9062194824219 
+
+Epoch: 000, Step:  2700, Loss:  3.07162857, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=699, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2700
+Iteration:  98%|█████████▊| 2714/2771 [06:39<00:03, 14.88it/s]DLL 2022-02-14 16:57:51.844017 - Training Epoch: 0 Training Iteration: 2700  step_loss : 3.0716285705566406  train_perf : 488.90618896484375 
+
+Epoch: 000, Step:  2750, Loss:  3.11427689, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=749, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2750
+Iteration: 100%|█████████▉| 2770/2771 [06:43<00:00,  6.87it/s]
+Iteration:   0%|          | 0/2771 [00:00<?, ?it/s]DLL 2022-02-14 16:57:55.179634 - Training Epoch: 0 Training Iteration: 2750  step_loss : 3.114276885986328  train_perf : 488.9019470214844 
+DLL 2022-02-14 16:57:56.444076 -  e2e_train_time : 403.22219729423523  training_sequences_per_second : 488.90985107421875  final_loss : 3.1978931427001953 
+
+Epoch: 001, Step:     0, Loss:  2.46887875, Perf:  456, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=769, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2770
+DLL 2022-02-14 16:58:00.312084 - Training Epoch: 1 Training Iteration: 0  step_loss : 2.468878746032715  train_perf : 455.5188903808594 
+
+Epoch: 001, Step:    50, Loss:  2.50745678, Perf:  487, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=819, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2820
+Iteration:   3%|▎         | 71/2771 [00:05<03:11, 14.08it/s]DLL 2022-02-14 16:58:03.658593 - Training Epoch: 1 Training Iteration: 50  step_loss : 2.5074567794799805  train_perf : 486.51129150390625 
+
+Epoch: 001, Step:   100, Loss:  2.55177736, Perf:  487, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=869, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2870
+Iteration:   5%|▌         | 146/2771 [00:10<03:03, 14.34it/s]DLL 2022-02-14 16:58:06.996027 - Training Epoch: 1 Training Iteration: 100  step_loss : 2.5517773628234863  train_perf : 487.40985107421875 
+
+Epoch: 001, Step:   150, Loss:  2.44877863, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=919, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2920
+DLL 2022-02-14 16:58:10.333584 - Training Epoch: 1 Training Iteration: 150  step_loss : 2.4487786293029785  train_perf : 487.75604248046875 
+
+Epoch: 001, Step:   200, Loss:  2.47036505, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=969, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:2970
+Iteration:   8%|▊         | 221/2771 [00:15<02:55, 14.52it/s]DLL 2022-02-14 16:58:13.669487 - Training Epoch: 1 Training Iteration: 200  step_loss : 2.470365047454834  train_perf : 487.99560546875 
+
+Epoch: 001, Step:   250, Loss:  2.52152061, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1019, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3020
+Iteration:  11%|█         | 297/2771 [00:20<02:48, 14.67it/s]DLL 2022-02-14 16:58:17.002466 - Training Epoch: 1 Training Iteration: 250  step_loss : 2.5215206146240234  train_perf : 488.15966796875 
+
+Epoch: 001, Step:   300, Loss:  2.42418242, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1069, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3070
+DLL 2022-02-14 16:58:20.338226 - Training Epoch: 1 Training Iteration: 300  step_loss : 2.424182415008545  train_perf : 488.2550354003906 
+
+Epoch: 001, Step:   350, Loss:  2.35175800, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1119, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3120
+Iteration:  13%|█▎        | 372/2771 [00:25<02:42, 14.76it/s]DLL 2022-02-14 16:58:23.677955 - Training Epoch: 1 Training Iteration: 350  step_loss : 2.3517580032348633  train_perf : 488.208251953125 
+
+Epoch: 001, Step:   400, Loss:  2.05334663, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1169, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3170
+Iteration:  16%|█▌        | 447/2771 [00:30<02:36, 14.83it/s]DLL 2022-02-14 16:58:27.011103 - Training Epoch: 1 Training Iteration: 400  step_loss : 2.053346633911133  train_perf : 488.2726135253906 
+
+Epoch: 001, Step:   450, Loss:  2.32024217, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1219, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3220
+DLL 2022-02-14 16:58:30.346918 - Training Epoch: 1 Training Iteration: 450  step_loss : 2.320242166519165  train_perf : 488.3057861328125 
+
+Epoch: 001, Step:   500, Loss:  2.51108742, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1269, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3270
+Iteration:  19%|█▉        | 523/2771 [00:35<02:31, 14.89it/s]DLL 2022-02-14 16:58:33.673246 - Training Epoch: 1 Training Iteration: 500  step_loss : 2.511087417602539  train_perf : 488.4371032714844 
+
+Epoch: 001, Step:   550, Loss:  2.22961569, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1319, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3320
+Iteration:  22%|██▏       | 599/2771 [00:40<02:25, 14.92it/s]DLL 2022-02-14 16:58:37.004947 - Training Epoch: 1 Training Iteration: 550  step_loss : 2.2296156883239746  train_perf : 488.4810485839844 
+
+Epoch: 001, Step:   600, Loss:  2.06699753, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1369, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3370
+DLL 2022-02-14 16:58:40.336452 - Training Epoch: 1 Training Iteration: 600  step_loss : 2.066997528076172  train_perf : 488.51898193359375 
+
+Epoch: 001, Step:   650, Loss:  2.77085257, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1419, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3420
+Iteration:  24%|██▍       | 674/2771 [00:45<02:20, 14.94it/s]DLL 2022-02-14 16:58:43.671783 - Training Epoch: 1 Training Iteration: 650  step_loss : 2.770852565765381  train_perf : 488.5253601074219 
+
+Epoch: 001, Step:   700, Loss:  2.39298582, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1469, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3470
+Iteration:  27%|██▋       | 749/2771 [00:50<02:15, 14.96it/s]DLL 2022-02-14 16:58:47.005431 - Training Epoch: 1 Training Iteration: 700  step_loss : 2.3929858207702637  train_perf : 488.5356750488281 
+
+Epoch: 001, Step:   750, Loss:  2.01259446, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1519, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3520
+DLL 2022-02-14 16:58:50.340999 - Training Epoch: 1 Training Iteration: 750  step_loss : 2.01259446144104  train_perf : 488.53619384765625 
+
+Epoch: 001, Step:   800, Loss:  2.78918648, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1569, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3570
+Iteration:  30%|██▉       | 824/2771 [00:55<02:10, 14.97it/s]DLL 2022-02-14 16:58:53.671909 - Training Epoch: 1 Training Iteration: 800  step_loss : 2.789186477661133  train_perf : 488.56280517578125 
+
+Epoch: 001, Step:   850, Loss:  2.95922494, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1619, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3620
+Iteration:  32%|███▏      | 899/2771 [01:00<02:05, 14.97it/s]DLL 2022-02-14 16:58:57.014499 - Training Epoch: 1 Training Iteration: 850  step_loss : 2.9592249393463135  train_perf : 488.50762939453125 
+
+Epoch: 001, Step:   900, Loss:  2.44909263, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1669, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3670
+DLL 2022-02-14 16:59:00.348335 - Training Epoch: 1 Training Iteration: 900  step_loss : 2.4490926265716553  train_perf : 488.5177001953125 
+
+Epoch: 001, Step:   950, Loss:  2.76099348, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1719, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3720
+Iteration:  35%|███▌      | 974/2771 [01:05<01:59, 14.98it/s]DLL 2022-02-14 16:59:03.683772 - Training Epoch: 1 Training Iteration: 950  step_loss : 2.760993480682373  train_perf : 488.5309143066406 
+
+Epoch: 001, Step:  1000, Loss:  2.61353970, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1769, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3770
+Iteration:  38%|███▊      | 1050/2771 [01:10<01:54, 14.99it/s]DLL 2022-02-14 16:59:07.013775 - Training Epoch: 1 Training Iteration: 1000  step_loss : 2.613539695739746  train_perf : 488.56939697265625 
+
+Epoch: 001, Step:  1050, Loss:  2.94815397, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1819, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3820
+DLL 2022-02-14 16:59:10.344845 - Training Epoch: 1 Training Iteration: 1050  step_loss : 2.9481539726257324  train_perf : 488.58807373046875 
+
+Epoch: 001, Step:  1100, Loss:  3.10968733, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1869, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3870
+Iteration:  41%|████      | 1125/2771 [01:15<01:49, 14.99it/s]DLL 2022-02-14 16:59:13.677966 - Training Epoch: 1 Training Iteration: 1100  step_loss : 3.109687328338623  train_perf : 488.59576416015625 
+
+Epoch: 001, Step:  1150, Loss:  3.09600878, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1919, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3920
+Iteration:  43%|████▎     | 1200/2771 [01:20<01:44, 14.99it/s]DLL 2022-02-14 16:59:17.012344 - Training Epoch: 1 Training Iteration: 1150  step_loss : 3.096008777618408  train_perf : 488.59942626953125 
+
+Epoch: 001, Step:  1200, Loss:  2.63050580, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=1969, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:3970
+DLL 2022-02-14 16:59:20.350788 - Training Epoch: 1 Training Iteration: 1200  step_loss : 2.6305058002471924  train_perf : 488.57318115234375 
+
+Epoch: 001, Step:  1250, Loss:  3.02493811, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=12, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4019
+Iteration:  46%|████▌     | 1275/2771 [01:25<01:39, 14.99it/s]DLL 2022-02-14 16:59:23.689231 - Training Epoch: 1 Training Iteration: 1250  step_loss : 3.0249381065368652  train_perf : 488.5591125488281 
+
+Epoch: 001, Step:  1300, Loss:  2.39242983, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=62, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4069
+Iteration:  49%|████▊     | 1350/2771 [01:30<01:34, 14.98it/s]DLL 2022-02-14 16:59:27.023248 - Training Epoch: 1 Training Iteration: 1300  step_loss : 2.392429828643799  train_perf : 488.5626525878906 
+
+Epoch: 001, Step:  1350, Loss:  2.56676865, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=112, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4119
+DLL 2022-02-14 16:59:30.365767 - Training Epoch: 1 Training Iteration: 1350  step_loss : 2.5667686462402344  train_perf : 488.52728271484375 
+
+Epoch: 001, Step:  1400, Loss:  2.61267138, Perf:  489, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=162, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4169
+Iteration:  51%|█████▏    | 1425/2771 [01:35<01:29, 14.98it/s]DLL 2022-02-14 16:59:33.702613 - Training Epoch: 1 Training Iteration: 1400  step_loss : 2.612671375274658  train_perf : 488.5198669433594 
+
+Epoch: 001, Step:  1450, Loss:  2.28970146, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=212, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4219
+Iteration:  54%|█████▍    | 1500/2771 [01:40<01:24, 14.98it/s]DLL 2022-02-14 16:59:37.045711 - Training Epoch: 1 Training Iteration: 1450  step_loss : 2.289701461791992  train_perf : 488.4818115234375 
+
+Epoch: 001, Step:  1500, Loss:  3.42055988, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=262, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4269
+DLL 2022-02-14 16:59:40.379950 - Training Epoch: 1 Training Iteration: 1500  step_loss : 3.420559883117676  train_perf : 488.4808349609375 
+
+Epoch: 001, Step:  1550, Loss:  2.62307382, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=312, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4319
+Iteration:  57%|█████▋    | 1575/2771 [01:45<01:19, 14.98it/s]DLL 2022-02-14 16:59:43.712581 - Training Epoch: 1 Training Iteration: 1550  step_loss : 2.6230738162994385  train_perf : 488.4967346191406 
+
+Epoch: 001, Step:  1600, Loss:  2.56612730, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=362, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4369
+Iteration:  60%|█████▉    | 1650/2771 [01:50<01:14, 14.98it/s]DLL 2022-02-14 16:59:47.050387 - Training Epoch: 1 Training Iteration: 1600  step_loss : 2.566127300262451  train_perf : 488.4844665527344 
+
+Epoch: 001, Step:  1650, Loss:  2.62661147, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=412, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4419
+DLL 2022-02-14 16:59:50.390612 - Training Epoch: 1 Training Iteration: 1650  step_loss : 2.6266114711761475  train_perf : 488.4621887207031 
+
+Epoch: 001, Step:  1700, Loss:  2.60695457, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=462, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4469
+Iteration:  62%|██████▏   | 1725/2771 [01:55<01:09, 14.98it/s]DLL 2022-02-14 16:59:53.725890 - Training Epoch: 1 Training Iteration: 1700  step_loss : 2.606954574584961  train_perf : 488.46337890625 
+
+Epoch: 001, Step:  1750, Loss:  2.96243715, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=512, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4519
+Iteration:  65%|██████▍   | 1800/2771 [02:00<01:04, 14.98it/s]DLL 2022-02-14 16:59:57.065655 - Training Epoch: 1 Training Iteration: 1750  step_loss : 2.962437152862549  train_perf : 488.44482421875 
+
+Epoch: 001, Step:  1800, Loss:  2.40478754, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=562, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4569
+DLL 2022-02-14 17:00:00.402389 - Training Epoch: 1 Training Iteration: 1800  step_loss : 2.404787540435791  train_perf : 488.4368896484375 
+
+Epoch: 001, Step:  1850, Loss:  2.78456259, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=612, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4619
+Iteration:  68%|██████▊   | 1875/2771 [02:05<00:59, 14.98it/s]DLL 2022-02-14 17:00:03.738074 - Training Epoch: 1 Training Iteration: 1850  step_loss : 2.784562587738037  train_perf : 488.4380798339844 
+
+Epoch: 001, Step:  1900, Loss:  2.60146332, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=662, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4669
+Iteration:  70%|███████   | 1950/2771 [02:10<00:54, 14.98it/s]DLL 2022-02-14 17:00:07.075302 - Training Epoch: 1 Training Iteration: 1900  step_loss : 2.6014633178710938  train_perf : 488.43328857421875 
+
+Epoch: 001, Step:  1950, Loss:  2.54709148, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=712, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4719
+DLL 2022-02-14 17:00:10.415027 - Training Epoch: 1 Training Iteration: 1950  step_loss : 2.547091484069824  train_perf : 488.41632080078125 
+
+Epoch: 001, Step:  2000, Loss:  2.61303401, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=762, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4769
+Iteration:  73%|███████▎  | 2025/2771 [02:15<00:49, 14.98it/s]DLL 2022-02-14 17:00:13.751142 - Training Epoch: 1 Training Iteration: 2000  step_loss : 2.6130340099334717  train_perf : 488.4198303222656 
+
+Epoch: 001, Step:  2050, Loss:  2.38268471, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=812, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4819
+Iteration:  76%|███████▌  | 2100/2771 [02:20<00:44, 14.98it/s]DLL 2022-02-14 17:00:17.089835 - Training Epoch: 1 Training Iteration: 2050  step_loss : 2.3826847076416016  train_perf : 488.4137268066406 
+
+Epoch: 001, Step:  2100, Loss:  2.87253237, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=32768.0, num_good_steps=862, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4869
+DLL 2022-02-14 17:00:20.428948 - Training Epoch: 1 Training Iteration: 2100  step_loss : 2.872532367706299  train_perf : 488.4039001464844 
+
+Epoch: 001, Step:  2150, Loss:  2.69187593, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=13, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4918
+Iteration:  78%|███████▊  | 2175/2771 [02:25<00:39, 14.98it/s]DLL 2022-02-14 17:00:23.760110 - Training Epoch: 1 Training Iteration: 2150  step_loss : 2.69187593460083  train_perf : 488.41754150390625 
+
+Epoch: 001, Step:  2200, Loss:  2.57885480, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=63, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:4968
+Iteration:  81%|████████  | 2250/2771 [02:30<00:34, 14.98it/s]DLL 2022-02-14 17:00:27.100365 - Training Epoch: 1 Training Iteration: 2200  step_loss : 2.57885479927063  train_perf : 488.4023132324219 
+
+Epoch: 001, Step:  2250, Loss:  2.40897894, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=113, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5018
+DLL 2022-02-14 17:00:30.442446 - Training Epoch: 1 Training Iteration: 2250  step_loss : 2.4089789390563965  train_perf : 488.3877258300781 
+
+Epoch: 001, Step:  2300, Loss:  2.42344952, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=163, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5068
+Iteration:  84%|████████▍ | 2325/2771 [02:35<00:29, 14.98it/s]DLL 2022-02-14 17:00:33.776499 - Training Epoch: 1 Training Iteration: 2300  step_loss : 2.4234495162963867  train_perf : 488.39532470703125 
+
+Epoch: 001, Step:  2350, Loss:  2.28411412, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=213, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5118
+DLL 2022-02-14 17:00:37.116500 - Training Epoch: 1 Training Iteration: 2350  step_loss : 2.284114122390747  train_perf : 488.3880310058594 
+
+Epoch: 001, Step:  2400, Loss:  2.44592810, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=263, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5168
+Iteration:  87%|████████▋ | 2401/2771 [02:40<00:24, 14.99it/s]DLL 2022-02-14 17:00:40.445956 - Training Epoch: 1 Training Iteration: 2400  step_loss : 2.4459280967712402  train_perf : 488.4017639160156 
+
+Epoch: 001, Step:  2450, Loss:  2.87706566, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=313, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5218
+Iteration:  89%|████████▉ | 2477/2771 [02:45<00:19, 14.99it/s]DLL 2022-02-14 17:00:43.779061 - Training Epoch: 1 Training Iteration: 2450  step_loss : 2.877065658569336  train_perf : 488.4108581542969 
+
+Epoch: 001, Step:  2500, Loss:  2.71774888, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=363, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5268
+DLL 2022-02-14 17:00:47.110024 - Training Epoch: 1 Training Iteration: 2500  step_loss : 2.7177488803863525  train_perf : 488.4207763671875 
+
+Epoch: 001, Step:  2550, Loss:  2.67376876, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=413, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5318
+Iteration:  92%|█████████▏| 2553/2771 [02:50<00:14, 15.00it/s]DLL 2022-02-14 17:00:50.442219 - Training Epoch: 1 Training Iteration: 2550  step_loss : 2.6737687587738037  train_perf : 488.42413330078125 
+
+Epoch: 001, Step:  2600, Loss:  3.01101351, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=463, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5368
+Iteration:  95%|█████████▍| 2628/2771 [02:55<00:09, 14.99it/s]DLL 2022-02-14 17:00:53.777132 - Training Epoch: 1 Training Iteration: 2600  step_loss : 3.0110135078430176  train_perf : 488.4261779785156 
+
+Epoch: 001, Step:  2650, Loss:  2.80916286, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=513, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5418
+DLL 2022-02-14 17:00:57.115604 - Training Epoch: 1 Training Iteration: 2650  step_loss : 2.8091628551483154  train_perf : 488.41900634765625 
+
+Epoch: 001, Step:  2700, Loss:  2.70059347, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=563, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5468
+Iteration:  98%|█████████▊| 2704/2771 [03:00<00:04, 14.99it/s]DLL 2022-02-14 17:01:00.447609 - Training Epoch: 1 Training Iteration: 2700  step_loss : 2.7005934715270996  train_perf : 488.4262390136719 
+
+Epoch: 001, Step:  2750, Loss:  2.67789125, Perf:  488, loss_scale:DynamicLossScale(current_loss_scale=16384.0, num_good_steps=613, initial_loss_scale=32768.0, increment_period=2000, multiplier=2.0), opt_step:5518
+Iteration: 100%|█████████▉| 2770/2771 [03:05<00:00, 14.96it/s]DLL 2022-02-14 17:01:03.783774 - Training Epoch: 1 Training Iteration: 2750  step_loss : 2.677891254425049  train_perf : 488.4241638183594 
+DLL 2022-02-14 17:01:05.052912 -  e2e_train_time : 588.3256070613861  training_sequences_per_second : 488.422607421875  final_loss : 2.65749192237854 
+***** Running evaluation *****
+  Num Batches =  22
+  Batch size =  512
+
+Iteration:   0%|          | 0/22 [00:00<?, ?it/s]2022-02-14 17:01:11.164344: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+2022-02-14 17:02:36.853166: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 17:02:37.912404: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 17:02:37.912423: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 17:02:37.912429: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 17:02:37.912431: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 17:02:37.912433: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 17:02:37.912435: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration:   5%|▍         | 1/22 [01:30<31:49, 90.92s/it]Iteration:  14%|█▎        | 3/22 [01:36<20:25, 64.49s/it]Iteration:  23%|██▎       | 5/22 [01:42<13:02, 46.02s/it]Iteration:  32%|███▏      | 7/22 [01:48<08:16, 33.10s/it]Iteration:  41%|████      | 9/22 [01:54<05:12, 24.07s/it]Iteration:  50%|█████     | 11/22 [02:00<03:15, 17.75s/it]Iteration:  59%|█████▉    | 13/22 [02:06<02:00, 13.34s/it]Iteration:  68%|██████▊   | 15/22 [02:12<01:11, 10.28s/it]Iteration:  77%|███████▋  | 17/22 [02:18<00:40,  8.14s/it]Iteration:  86%|████████▋ | 19/22 [02:25<00:19,  6.66s/it]Iteration:  95%|█████████▌| 21/22 [02:31<00:05,  5.59s/it]2022-02-14 17:03:42.474437: W ./tensorflow/compiler/xla/service/hlo_pass_fix.h:49] Unexpectedly high number of iterations in HLO passes, exiting fixed point loop.
+Iteration:  95%|█████████▌| 21/22 [02:50<00:05,  5.59s/it]2022-02-14 17:04:52.592199: W tensorflow/compiler/xla/service/gpu/llvm_gpu_backend/gpu_backend_lib.cc:95] Unknown compute capability (8, 6) .Defaulting to telling LLVM that we're compiling for sm_75
+2022-02-14 17:04:53.662454: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:70] Can't find ptxas binary in ${CUDA_DIR}/bin.  Will back to the GPU driver for PTX -> sass compilation.  This is OK so long as you don't see a warning below about an out-of-date driver version. Custom ptxas location can be specified using $PATH.
+2022-02-14 17:04:53.662474: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:71] Searched for CUDA in the following directories:
+2022-02-14 17:04:53.662480: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   ./cuda_sdk_lib
+2022-02-14 17:04:53.662482: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   /usr/local/cuda
+2022-02-14 17:04:53.662484: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:74]   .
+2022-02-14 17:04:53.662485: W tensorflow/compiler/xla/service/gpu/nvptx_compiler.cc:76] You can choose the search directory by setting xla_gpu_cuda_data_dir in HloModule's DebugOptions.  For most apps, setting the environment variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.
+Iteration: 100%|██████████| 22/22 [03:44<00:00, 25.76s/it]Iteration: 100%|██████████| 22/22 [03:44<00:00, 10.20s/it]{"exact_match": 11.74077578051088, "f1": 16.25460487918555}
+
+Epoch: 001 Results: {"exact_match": 11.74077578051088, "f1": 16.25460487918555}
+
+**EVAL SUMMARY** - Epoch: 001,  EM: 11.741, F1: 16.255, Infer_Perf: 1052 seq/s
+**LATENCY SUMMARY** - Epoch: 001,  Ave: 442.854 ms, 90%: 442.350 ms, 95%: 442.588 ms, 99%: 442.588 ms
+DLL 2022-02-14 17:05:11.201771 -  inference_sequences_per_second : 1051.665771484375  e2e_inference_time : 238.69672966003418 
+**RESULTS SUMMARY** - EM: 11.741, F1: 16.255, Train_Time:  588 s, Train_Perf:  488 seq/s, Infer_Perf: 1052 seq/s
+
+DLL 2022-02-14 17:05:11.202545 -  exact_match : 11.74077578051088  F1 : 16.25460487918555 
+====================================  END test_results/models/base/checkpoints/ckpt-5  ====================================
