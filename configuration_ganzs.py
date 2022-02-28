@@ -68,6 +68,7 @@ class ElectraConfig(PretrainedConfig):
         self.hidden_act=self.activation_function
         # some extra
         self.add_cross_attention = False
+        self.amp = True
 
         super().__init__(bos_token_id=bos_token_id, eos_token_id=eos_token_id, **kwargs)
 
